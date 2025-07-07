@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Test Giao diện Phân quyền</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f6fa; margin: 0; padding: 0; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px; }
+        h1 { text-align: center; }
+        .role-select { margin: 0 auto 32px auto; display: flex; justify-content: center; align-items: center; gap: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 32px; }
+        th, td { border: 1px solid #e0e0e0; padding: 10px 8px; text-align: center; }
+        th { background: #f0f0f0; }
+        .tick { color: #2ecc40; font-size: 1.3em; }
+        .cross { color: #ff4136; font-size: 1.3em; }
+        .note { color: #0074d9; font-size: 1em; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Test Giao diện Phân quyền</h1>
+    <div class="role-select">
+        <label for="role">Chọn vai trò: </label>
+        <select id="role">
+            <option value="">-- Chọn role --</option>
+            <option value="Admin">Admin</option>
+            <option value="Thủ kho">Thủ kho</option>
+            <option value="Giảng viên">Giảng viên</option>
+            <option value="Sinh viên">Sinh viên</option>
+        </select>
+    </div>
+
+    <div id="role-features"></div>
+</div>
+<script>
+const features = [
+    { name: "Quản lý người dùng", roles: { "Admin": "tick", "Thủ kho": "cross", "Giảng viên": "cross", "Sinh viên": "cross" } },
+    { name: "Quản lý thiết bị", roles: { "Admin": "tick", "Thủ kho": "tick", "Giảng viên": "cross", "Sinh viên": "cross" } },
+    { name: "Quản lý mượn/trả", roles: { "Admin": "tick", "Thủ kho": "tick", "Giảng viên": "tick", "Sinh viên": "cross" } },
+    { name: "Gửi yêu cầu mượn thiết bị", roles: { "Admin": "cross", "Thủ kho": "cross", "Giảng viên": "tick", "Sinh viên": "tick" } },
+    { name: "Xem lịch sử mượn", roles: { "Admin": "tick", "Thủ kho": "tick", "Giảng viên": "tick", "Sinh viên": "tick" } },
+    { name: "Duyệt yêu cầu", roles: { "Admin": "tick", "Thủ kho": "tick", "Giảng viên": "cross", "Sinh viên": "cross" } },
+    { name: "Thống kê thiết bị", roles: { "Admin": "tick", "Thủ kho": "tick", "Giảng viên": "note", "Sinh viên": "cross" } },
+    { name: "Báo lỗi / sự cố thiết bị", roles: { "Admin": "tick", "Thủ kho": "tick", "Giảng viên": "tick", "Sinh viên": "note" } },
+    { name: "Tìm kiếm thiết bị", roles: { "Admin": "tick", "Thủ kho": "tick", "Giảng viên": "tick", "Sinh viên": "tick" } }
+];
+
+const icons = {
+    tick: '<span class="tick">&#10003;</span>',
+    cross: '<span class="cross">&#10007;</span>',
+    note: '<span class="note">Có thể</span>'
+};
+
+const roleSelect = document.getElementById('role');
+const roleFeatures = document.getElementById('role-features');
+
+roleSelect.addEventListener('change', function() {
+    const role = roleSelect.value;
+    if (!role) {
+        roleFeatures.innerHTML = '';
+        return;
+    }
+    let html = '<table><tr><th>Chức năng</th><th>' + role + '</th></tr>';
+    features.forEach(f => {
+        html += '<tr><td>' + f.name + '</td><td>' + icons[f.roles[role]] + '</td></tr>';
+    });
+    html += '</table>';
+    roleFeatures.innerHTML = html;
+});
+</script>
+</body>
+</html> 

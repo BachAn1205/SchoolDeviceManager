@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h2>Trang quản lý thiết bị trường học</h2>
+<div id="info"></div>
+<div id="adminPanel" style="display:none;">
+    <h3>👑 Chức năng của Admin</h3>
+    <ul>
+        <li>Quản lý người dùng</li>
+        <li>Quản lý thiết bị</li>
+        <li>Phân quyền người dùng</li>
+        <li>Thống kê toàn hệ thống</li>
+    </ul>
+</div>
+<div id="lecturerPanel" style="display:none;">
+    <h3>🎓 Chức năng giảng viên</h3>
+    <ul>
+        <li>Gửi yêu cầu mượn thiết bị</li>
+        <li>Xem lịch sử sử dụng thiết bị</li>
+    </ul>
+</div>
+<div id="studentPanel" style="display:none;">
+    <h3>🎓 Chức năng sinh viên</h3>
+    <ul>
+        <li>Mượn thiết bị học tập</li>
+        <li>Xem trạng thái yêu cầu</li>
+    </ul>
+</div>
+<div id="technicianPanel" style="display:none;">
+    <h3>🛠 Chức năng kỹ thuật viên</h3>
+    <ul>
+        <li>Xem danh sách thiết bị hỏng</li>
+        <li>Cập nhật sửa chữa, bảo trì</li>
+    </ul>
+</div>
+<div id="staffPanel" style="display:none;">
+    <h3>📦 Nhân viên thiết bị</h3>
+    <ul>
+        <li>Quản lý kho thiết bị</li>
+        <li>Ghi nhận tình trạng</li>
+        <li>Phê duyệt mượn trả</li>
+    </ul>
+</div>
+
+<script>
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+        alert("Bạn chưa đăng nhập");
+        window.location.href = "/index.html";
+    }
+
+    document.getElementById("info").innerText = `Xin chào ${user.fullName} (${user.role})`;
+
+    switch (user.role) {
+        case "Admin": document.getElementById("adminPanel").style.display = "block"; break;
+        case "Giảng viên": document.getElementById("lecturerPanel").style.display = "block"; break;
+        case "Sinh viên": document.getElementById("studentPanel").style.display = "block"; break;
+        case "Kỹ thuật viên": document.getElementById("technicianPanel").style.display = "block"; break;
+        case "Nhân viên thiết bị": document.getElementById("staffPanel").style.display = "block"; break;
+    }
+</script>
+
+
+</body>
+</html>
