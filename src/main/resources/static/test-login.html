@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login - CMC University</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    Test Role-Based Login
+                </h2>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Click on any role to test the login redirection
+                </p>
+            </div>
+            <div class="space-y-4">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                        <i class="fas fa-shield-alt text-red-500 mr-2"></i>
+                        Admin
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">Full system access and management</p>
+                    <a href="dashboard-admin.html" onclick="testLogin('an','123456'); return false;" class="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 block text-center">
+                        Login as Admin
+                    </a>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                        <i class="fas fa-clipboard-list text-green-500 mr-2"></i>
+                        Equipment Staff
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">Inventory and request management</p>
+                    <a href="dashboard-nhanvien.html" onclick="testLogin('annvtb','123456'); return false;" class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 block text-center">
+                        Login as Equipment Staff
+                    </a>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                        <i class="fas fa-tools text-orange-500 mr-2"></i>
+                        Technician
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">Maintenance and repair management</p>
+                    <a href="dashboard-kythuatvien.html" onclick="testLogin('anktv2','123456'); return false;" class="w-full bg-orange-500 text-white py-2 px-4 rounded-md hover:bg-orange-600 block text-center">
+                        Login as Technician
+                    </a>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                        <i class="fas fa-user-graduate text-blue-500 mr-2"></i>
+                        Student
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">Equipment search and borrowing</p>
+                    <a href="dashboard-sinhvien.html" onclick="testLogin('ansv','123456'); return false;" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 block text-center">
+                        Login as Student
+                    </a>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                        <i class="fas fa-chalkboard-teacher text-purple-500 mr-2"></i>
+                        Teacher
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">Equipment search and borrowing</p>
+                    <a href="dashboard-giangvien.html" onclick="testLogin('angv','123456'); return false;" class="w-full bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 block text-center">
+                        Login as Teacher
+                    </a>
+                </div>
+            </div>
+            <div class="text-center">
+                <a href="login.html" class="text-blue-600 hover:text-blue-500">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to regular login
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function testLogin(username, password) {
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem("userRole", data.user.role);
+                    localStorage.setItem("userName", data.user.fullName || data.user.username);
+                    switch (data.user.role) {
+                        case "Admin":
+                            window.location.href = "dashboard-admin.html";
+                            break;
+                        case "Nhân viên thiết bị":
+                            window.location.href = "dashboard-nhanvien.html";
+                            break;
+                        case "Kỹ thuật viên":
+                            window.location.href = "dashboard-kythuatvien.html";
+                            break;
+                        case "Sinh viên":
+                            window.location.href = "dashboard-sinhvien.html";
+                            break;
+                        case "Giảng viên":
+                            window.location.href = "dashboard-giangvien.html";
+                            break;
+                        default:
+                            alert("Vai trò không hợp lệ được trả về từ máy chủ!");
+                    }
+                } else {
+                    const errText = await res.text();
+                    alert("Đăng nhập thất bại: " + errText);
+                }
+            } catch (error) {
+                alert("Lỗi khi đăng nhập: " + error);
+            }
+        }
+    </script>
+</body>
+</html> 

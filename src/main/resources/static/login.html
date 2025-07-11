@@ -7,209 +7,149 @@
 </head>
 <style>
     body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  background-color: #fff;
-}
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background-color: #fff;
+    }
 
-header, footer {
-  border: 1px solid #eee;
-  padding: 1rem 0;
-}
+    header, footer {
+        border: 1px solid #eee;
+        padding: 1rem 0;
+    }
 
-header nav a {
-  text-decoration: none;
-  color: #000;
-}
+    header nav a {
+        text-decoration: none;
+        color: #000;
+    }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
 
-.login-title {
-  text-align: center;
-  font-weight: bold;
-  font-size: 1.5rem;
-  margin-bottom: 2.5rem;
-}
+    .login-title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
 
-form {
-  max-width: 700px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
+    form {
+        max-width: 700px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
 
-.form-row {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.form-col {
-  flex: 1;
-  min-width: 260px;
-  display: flex;
-  flex-direction: column;
-}
-
-.form-label {
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.4rem;
-}
-
-.form-input {
-  padding: 0.6rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 1rem;
-}
-
-.form-input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-  outline: none;
-}
-
-.form-button {
-  text-align: center;
-  margin-top: 1.5rem;
-}
-
-.submit-btn {
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 0.375rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  min-width: 160px;
-}
-
-.submit-btn:hover {
-  background-color: #1d4ed8;
-}
-
-@media (max-width: 768px) {
-  .form-row {
-    flex-direction: column;
-  }
-}
-
+    .form-row {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        /* ... giữ nguyên các style khác ... */
+    }
 </style>
 <body>
-
 <header>
-    <div class="container" style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-weight:bold;">CMC University</div>
-        <nav style="display:flex;gap:2rem;font-weight:600;">
-            <a href="index.html">Trang chính</a>
+    <div class="container">
+        <nav>
+            <a href="index.html">Trang chính</a> |
             <a href="register.html">Đăng ký</a>
-            <a href="login.html">Đăng nhập</a>
         </nav>
     </div>
 </header>
 
-<main class="container">
-    <div class="login-title">Đăng nhập hệ thống</div>
+<div class="container">
+    <h1 class="login-title">Đăng nhập hệ thống quản lý thiết bị</h1>
     <form onsubmit="login(event)">
         <div class="form-row">
-            <div class="form-col">
-                <label for="username" class="form-label">Tên đăng nhập</label>
-                <input id="username" name="username" class="form-input" required autocomplete="username" />
+            <div style="flex:1;">
+                <label for="username">Tên đăng nhập:</label>
+                <input type="text" id="username" name="username" placeholder="Nhập tên đăng nhập" required style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;" />
             </div>
-
-            <div class="form-col">
-                <label for="password" class="form-label">Mật khẩu</label>
-                <input id="password" name="password" type="password" class="form-input" required autocomplete="current-password" />
+            <div style="flex:1;">
+                <label for="password">Mật khẩu:</label>
+                <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;" />
             </div>
         </div>
-
-        <div class="form-col">
-            <label for="role" class="form-label">Vai trò</label>
-            <select id="role" name="role" class="form-input" required autocomplete="role">
-                <option value="">Chọn vai trò</option>
-                <option value="Admin">Admin</option>
-                <option value="Sinh viên">Sinh viên</option>
-                <option value="Giảng viên">Giảng viên</option>
-                <option value="Kỹ thuật viên">Kỹ thuật viên</option>
-                <option value="Nhân viên thiết bị">Nhân viên thiết bị</option>
-            </select>
-        </div>
-
-        <div class="form-button">
-            <button type="submit" class="submit-btn">Đăng nhập</button>
-        </div>
+        <button type="submit" style="padding:0.75rem 1.5rem; background-color:#007bff; color:white; border:none; border-radius:4px; cursor:pointer;">Đăng nhập</button>
     </form>
-</main>
+</div>
 
 <footer>
-    <div class="container" style="display:flex;justify-content:space-between;">
-        <div>
-            <strong>CMC University</strong>
-            <div style="color:#6b7280;">© CMC University – Hệ thống quản lý thiết bị trường học</div>
-        </div>
-        <nav>
-            <div style="font-weight:600;">Navigation</div>
-            <ul style="list-style:none;padding:0;margin:0;line-height:1.8;color:#6b7280;">
-                <li><a href="index.html">Trang chính</a></li>
-                <li><a href="register.html">Đăng ký</a></li>
-                <li><a href="login.html">Đăng nhập</a></li>
-            </ul>
-        </nav>
+    <div class="container">
+        <div style="font-weight:600;">Navigation</div>
+        <ul style="list-style:none;padding:0;margin:0;line-height:1.8;color:#6b7280;">
+            <li><a href="index.html">Trang chính</a></li>
+            <li><a href="register.html">Đăng ký</a></li>
+            <li><a href="login.html">Đăng nhập</a></li>
+        </ul>
     </div>
 </footer>
 
-   <script>
-    async function login(e) {
-        e.preventDefault();
-        console.log("Login function called");
-        if (!role.value) {
-            alert("Vui lòng chọn vai trò!");
+<script>
+    async function login(event) {
+        event.preventDefault(); // Ngăn chặn hành vi submit mặc định của form
+
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+
+        if (!username.value || !password.value) {
+            alert('Vui lòng điền đầy đủ tên đăng nhập và mật khẩu.');
             return;
         }
-        const res = await fetch("/api/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                username: username.value,
-                password: password.value,
-                role: role.value
-            })
-        });
-        if (res.ok) {
-            const data = await res.json();
-            console.log(data);
-            localStorage.setItem("userRole", data.role);
-            localStorage.setItem("userName", data.fullName || data.username);
-            switch (data.role) {
-                case "Admin":
-                    window.location.href = "/dashboard-admin.html";
-                    break;
-                case "Nhân viên thiết bị":
-                    window.location.href = "/dashboard-nhanvien.html";
-                    break;
-                case "Kỹ thuật viên":
-                    window.location.href = "/dashboard-kythuatvien.html";
-                    break;
-                case "Sinh viên":
-                    window.location.href = "/dashboard-sinhvien.html";
-                    break;
-                case "Giảng viên":
-                    window.location.href = "/dashboard-giangvien.html";
-                    break;
-                default:
-                    alert("Role không hợp lệ!");
+
+        try {
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: username.value,
+                    password: password.value
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                console.log("Response data:", data); // Log toàn bộ data để kiểm tra cấu trúc
+
+                // Kiểm tra và hiển thị message
+                if (data.message) {
+                    alert(data.message);
+                }
+
+                // LƯU Ý: Backend trả về cấu trúc { message: "...", user: { ... } }
+                // Nên bạn cần truy cập data.user.role và data.user.fullName
+                localStorage.setItem("userRole", data.user.role);
+                localStorage.setItem("userName", data.user.fullName || data.user.username); // Dùng data.user.username nếu fullName null
+
+                switch (data.user.role) {
+                    case "Admin":
+                        window.location.href = "dashboard-admin.html";
+                        break;
+                    case "Nhân viên thiết bị":
+                        window.location.href = "dashboard-nhanvien.html";
+                        break;
+                    case "Kỹ thuật viên":
+                        window.location.href = "dashboard-kythuatvien.html";
+                        break;
+                    case "Sinh viên":
+                        window.location.href = "dashboard-sinhvien.html";
+                        break;
+                    case "Giảng viên":
+                        window.location.href = "dashboard-giangvien.html";
+                        break;
+                    default:
+                        alert("Vai trò không hợp lệ được trả về từ máy chủ!");
+                }
+            } else {
+                const errText = await res.text();
+                alert("Đăng nhập thất bại: " + errText);
             }
-        } else {
-            const errText = await res.text();
-            alert("Đăng nhập thất bại: " + errText);
+        } catch (error) {
+            console.error('Lỗi khi đăng nhập (Network hoặc JS error):', error);
+            alert('Đã xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại.');
         }
     }
 </script>
