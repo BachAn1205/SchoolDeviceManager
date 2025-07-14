@@ -8,53 +8,67 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger; // THÊM DÒNG NÀY
-import org.slf4j.LoggerFactory; // THÊM DÒNG NÀY
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*") // Cho phép truy cập từ frontend (React/HTML)
 public class AuthController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class); // THÊM DÒNG NÀY
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private UserService userService;
 
+    // Đăng ký tài khoản
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         List<String> errors = userService.register(user);
         if (errors.isEmpty()) {
+            logger.info("Đăng ký thành công cho username: {}", user.getUsername());
             return ResponseEntity.ok("Đăng ký thành công");
         } else {
+            logger.warn("Đăng ký thất bại cho username: {} với lỗi: {}", user.getUsername(), errors);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errors);
         }
     }
 
+    // Đăng nhập tài khoản
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
-        logger.info("Attempting login for username: {}", user.getUsername());
+        logger.info("Đăng nhập với username: {}", user.getUsername());
+
         User foundUser = userService.login(user.getUsername(), user.getPassword());
 
         if (foundUser == null) {
-            logger.warn("Login failed for username: {}. Incorrect credentials.", user.getUsername());
+            logger.warn("Đăng nhập thất bại: Sai tài khoản hoặc mật khẩu cho username: {}", user.getUsername());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai tài khoản hoặc mật khẩu");
         }
 
-        logger.info("Login successful for user: {} with actual role: {}", foundUser.getUsername(), foundUser.getRole());
-
+        // Chuyển dữ liệu sang DTO để bảo vệ dữ liệu nhạy cảm
         try {
-            UserDTO userDTO = new UserDTO(foundUser.getUserID(), foundUser.getUsername(), foundUser.getFullName(), foundUser.getEmail(), foundUser.getPhone(), foundUser.getRole());
+            UserDTO userDTO = new UserDTO(
+                    foundUser.getUserID(),
+                    foundUser.getUsername(),
+                    foundUser.getFullName(),
+                    foundUser.getEmail(),
+                    foundUser.getPhone(),
+                    foundUser.getRole()
+            );
+
             LoginResponse response = new LoginResponse("Đăng nhập thành công", userDTO);
-            logger.debug("Returning LoginResponse: message={}, user.username={}, user.role={}, user.fullName={}",
-                    response.getMessage(), userDTO.getUsername(),
-                    userDTO.getRole(), userDTO.getFullName());
+
+            logger.info("Đăng nhập thành công: user={}, role={}, fullName={}",
+                    userDTO.getUsername(), userDTO.getRole(), userDTO.getFullName());
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error during LoginResponse serialization: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi máy chủ khi xử lý phản hồi đăng nhập.");
+            logger.error("Lỗi khi tạo LoginResponse: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi máy chủ khi xử lý phản hồi đăng nhập.");
         }
     }
 }

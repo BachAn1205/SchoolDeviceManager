@@ -45,6 +45,7 @@
 
     .form-row {
         display: flex;
+        flex-direction: column;
         gap: 1.5rem;
         flex-wrap: wrap;
         /* ... giữ nguyên các style khác ... */
@@ -90,69 +91,73 @@
 
 <script>
     async function login(event) {
-        event.preventDefault(); // Ngăn chặn hành vi submit mặc định của form
+        event.preventDefault(); // Ngăn submit mặc định
 
-        const username = document.getElementById('username');
-        const password = document.getElementById('password');
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
 
-        if (!username.value || !password.value) {
-            alert('Vui lòng điền đầy đủ tên đăng nhập và mật khẩu.');
+        if (!username || !password) {
+            alert('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!');
             return;
         }
 
         try {
-            const res = await fetch("/api/auth/login", {
+            const response = await fetch("/api/auth/login", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    username: username.value,
-                    password: password.value
-                })
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ username, password })
             });
 
-            if (res.ok) {
-                const data = await res.json();
-                console.log("Response data:", data); // Log toàn bộ data để kiểm tra cấu trúc
-
-                // Kiểm tra và hiển thị message
-                if (data.message) {
-                    alert(data.message);
-                }
-
-                // LƯU Ý: Backend trả về cấu trúc { message: "...", user: { ... } }
-                // Nên bạn cần truy cập data.user.role và data.user.fullName
-                localStorage.setItem("userRole", data.user.role);
-                localStorage.setItem("userName", data.user.fullName || data.user.username); // Dùng data.user.username nếu fullName null
-
-                switch (data.user.role) {
-                    case "Admin":
-                        window.location.href = "dashboard-admin.html";
-                        break;
-                    case "Nhân viên thiết bị":
-                        window.location.href = "dashboard-nhanvien.html";
-                        break;
-                    case "Kỹ thuật viên":
-                        window.location.href = "dashboard-kythuatvien.html";
-                        break;
-                    case "Sinh viên":
-                        window.location.href = "dashboard-sinhvien.html";
-                        break;
-                    case "Giảng viên":
-                        window.location.href = "dashboard-giangvien.html";
-                        break;
-                    default:
-                        alert("Vai trò không hợp lệ được trả về từ máy chủ!");
-                }
-            } else {
-                const errText = await res.text();
+            if (!response.ok) {
+                const errText = await response.text();
                 alert("Đăng nhập thất bại: " + errText);
+                return;
             }
+
+            const data = await response.json();
+
+            // ✅ Log toàn bộ dữ liệu người dùng ra console
+            console.log("Dữ liệu trả về từ backend:", data);
+            console.log("ID:", data.user.id);
+            console.log("Tên:", data.user.fullName || data.user.username);
+            console.log("Email:", data.user.email);
+            console.log("Vai trò:", data.user.role);
+            alert(data.message || "Đăng nhập thành công!");
+
+            // ✅ Lưu vào localStorage để dùng sau
+            localStorage.setItem("userRole", data.user.role);
+            localStorage.setItem("userName", data.user.fullName || data.user.username);
+
+            // ✅ Điều hướng theo vai trò
+            switch (data.user.role) {
+                case "Admin":
+                    window.location.href = "dashboard-admin.html";
+                    break;
+                case "Nhân viên thiết bị":
+                    window.location.href = "dashboard-nhanvien.html";
+                    break;
+                case "Kỹ thuật viên":
+                    window.location.href = "dashboard-kythuatvien.html";
+                    break;
+                case "Giảng viên":
+                    window.location.href = "dashboard-giangvien.html";
+                    break;
+                case "Sinh viên":
+                    window.location.href = "dashboard-sinhvien.html";
+                    break;
+                default:
+                    alert("Vai trò không xác định: " + data.user.role);
+            }
+
         } catch (error) {
-            console.error('Lỗi khi đăng nhập (Network hoặc JS error):', error);
-            alert('Đã xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại.');
+            console.error("Lỗi trong quá trình đăng nhập:", error);
+            alert("Đã xảy ra lỗi kết nối hoặc xử lý dữ liệu. Vui lòng thử lại.");
         }
     }
 </script>
+
 
 </body>
 </html>

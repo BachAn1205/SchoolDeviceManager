@@ -14,15 +14,12 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/index.html", "/login.html", "/register.html", "/css/**", "/js/**", "/images/**", "/static/**",
-                    "/api/auth/register", "/api/auth/login"
-                ).permitAll()
+                    "/index.html", "/login.html", "/register.html", "/dashboard-*.html","/css/**", "/js/**", "/images/**", "/static/**",
+                    "/api/auth/register", "/api/auth/login","/favicon.ico"
+                        ).permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form
-                .loginPage("/test-login.html")
-                .permitAll()
-            )
+
             .logout(logout -> logout.permitAll());
 
         return http.build();
