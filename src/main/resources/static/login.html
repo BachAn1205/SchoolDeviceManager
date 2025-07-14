@@ -133,23 +133,24 @@
             // ✅ Điều hướng theo vai trò
             switch (data.user.role) {
                 case "Admin":
-                    window.location.href = "dashboard-admin.html";
+                    window.location.href = "admin/dashboard-admin.html";
                     break;
                 case "Nhân viên thiết bị":
-                    window.location.href = "dashboard-nhanvien.html";
+                    window.location.href = "nhanvien/dashboard-nhanvien.html";
                     break;
                 case "Kỹ thuật viên":
-                    window.location.href = "dashboard-kythuatvien.html";
+                    window.location.href = "kythuatvien/dashboard-kythuatvien.html";
                     break;
                 case "Giảng viên":
-                    window.location.href = "dashboard-giangvien.html";
+                    window.location.href = "giangvien/dashboard-giangvien.html";
                     break;
                 case "Sinh viên":
-                    window.location.href = "dashboard-sinhvien.html";
+                    window.location.href = "sinhvien/dashboard-sinhvien.html";
                     break;
                 default:
                     alert("Vai trò không xác định: " + data.user.role);
             }
+
 
         } catch (error) {
             console.error("Lỗi trong quá trình đăng nhập:", error);

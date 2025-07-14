@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CMC University - Tìm thiết bị</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    <script>
+        window.onload = function() {
+            const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
+            if (!userName || !userRole) {
+                window.location.href = 'login.html';
+                return;
+            }
+            if (userRole !== 'Sinh viên') {
+                window.location.href = 'login.html';
+                return;
+            }
+            document.getElementById('userNameNav').innerText = userName;
+            document.getElementById('userRoleNav').innerText = userRole;
+        };
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-900">CMC University - Student Panel</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-user-circle text-gray-400 text-lg"></i>
+                    <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800" id="userRoleNav">Sinh viên</span>
+                </div>
+                <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="flex">
+    <div class="w-64 bg-white shadow-sm min-h-screen">
+        <div class="p-4">
+            <nav class="space-y-2">
+                <a href="dashboard-sinhvien.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Tổng quan
+                </a>
+                <a href="find_equipment.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                    <i class="fas fa-search mr-3"></i>
+                    Tìm thiết bị
+                </a>
+                <a href="my_requests_student.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    Yêu cầu của tôi
+                </a>
+                <a href="borrow_history.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-history mr-3"></i>
+                    Lịch sử
+                </a>
+                <a href="student_profile.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-user mr-3"></i>
+                    Hồ sơ
+                </a>
+            </nav>
+        </div>
+    </div>
+    <div class="flex-1 p-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Tìm kiếm & Mượn thiết bị</h1>
+            <p class="text-gray-600">Tìm kiếm và yêu cầu mượn thiết bị CMC University</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
+                <input type="text" placeholder="Tìm kiếm theo tên thiết bị, mã, loại..." class="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <select class="block w-full sm:w-auto pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                    <option>Tất cả loại</option>
+                    <option>Máy chiếu</option>
+                    <option>Máy tính xách tay</option>
+                    <option>Micrô</option>
+                    <option>Camera</option>
+                    <option>Thiết bị âm thanh</option>
+                </select>
+                <button class="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full sm:w-auto">
+                    <i class="fas fa-search mr-2"></i>
+                    Tìm kiếm
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col justify-between h-full">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-1">Máy chiếu Epson EB-X49</h3>
+                        <p class="text-sm text-gray-600 mb-2">Mã: PROJ001</p>
+                        <p class="text-sm text-gray-700">Tình trạng: <span class="font-medium text-green-600">Sẵn có</span></p>
+                        <p class="text-sm text-gray-700 mt-1">Vị trí: Kho thiết bị A</p>
+                    </div>
+                    <div class="mt-4">
+                        <button class="w-full inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i class="fas fa-handshake mr-2"></i>
+                            Yêu cầu mượn
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col justify-between h-full">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-1">Laptop Dell XPS 15</h3>
+                        <p class="text-sm text-gray-600 mb-2">Mã: LAP005</p>
+                        <p class="text-sm text-gray-700">Tình trạng: <span class="font-medium text-red-600">Đã mượn</span></p>
+                        <p class="text-sm text-gray-700 mt-1">Vị trí: Phòng B203 (đã mượn)</p>
+                    </div>
+                    <div class="mt-4">
+                        <button disabled class="w-full inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-400 cursor-not-allowed">
+                            <i class="fas fa-handshake mr-2"></i>
+                            Không khả dụng
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col justify-between h-full">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-1">Micrô Rode NT-USB Mini</h3>
+                        <p class="text-sm text-gray-600 mb-2">Mã: MIC002</p>
+                        <p class="text-sm text-gray-700">Tình trạng: <span class="font-medium text-green-600">Sẵn có</span></p>
+                        <p class="text-sm text-gray-700 mt-1">Vị trí: Kho thiết bị B</p>
+                    </div>
+                    <div class="mt-4">
+                        <button class="w-full inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i class="fas fa-handshake mr-2"></i>
+                            Yêu cầu mượn
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

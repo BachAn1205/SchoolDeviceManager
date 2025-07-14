@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CMC University - Báo cáo kỹ thuật viên</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    <script>
+        window.onload = function() {
+            const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
+            if (!userName || !userRole) {
+                window.location.href = 'login.html';
+                return;
+            }
+            if (userRole !== 'Kỹ thuật viên') {
+                window.location.href = 'login.html';
+                return;
+            }
+            document.getElementById('userNameNav').innerText = userName;
+            document.getElementById('userRoleNav').innerText = userRole;
+
+            // Sample Chart for Maintenance Completion Rate
+            const maintenanceCompletionCtx = document.getElementById('maintenanceCompletionChart').getContext('2d');
+            new Chart(maintenanceCompletionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
+                    datasets: [{
+                        label: 'Số nhiệm vụ hoàn thành',
+                        data: [10, 12, 15, 13, 16, 18],
+                        backgroundColor: '#10B981',
+                        borderColor: '#059669',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tỷ lệ hoàn thành bảo trì'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Sample Chart for Repair Time
+            const repairTimeCtx = document.getElementById('repairTimeChart').getContext('2d');
+            new Chart(repairTimeCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Thiết bị A', 'Thiết bị B', 'Thiết bị C', 'Thiết bị D', 'Thiết bị E'],
+                    datasets: [{
+                        label: 'Thời gian sửa chữa trung bình (giờ)',
+                        data: [5, 3, 8, 4, 6],
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Thời gian sửa chữa trung bình của thiết bị'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        };
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-900">CMC University - Technician Panel</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-user-circle text-gray-400 text-lg"></i>
+                    <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800" id="userRoleNav">Kỹ thuật viên</span>
+                </div>
+                <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="flex">
+    <div class="w-64 bg-white shadow-sm min-h-screen">
+        <div class="p-4">
+            <nav class="space-y-2">
+                <a href="dashboard-kythuatvien.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Tổng quan
+                </a>
+                <a href="maintenance_schedule.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-tools mr-3"></i>
+                    Lịch bảo trì
+                </a>
+                <a href="repair_requests.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-wrench mr-3"></i>
+                    Sửa chữa
+                </a>
+                <a href="equipment_management_tech.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-laptop mr-3"></i>
+                    Thiết bị
+                </a>
+                <a href="tech_reports.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Báo cáo
+                </a>
+            </nav>
+        </div>
+    </div>
+    <div class="flex-1 p-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Báo cáo kỹ thuật</h1>
+            <p class="text-gray-600">Xem các báo cáo về hoạt động bảo trì, sửa chữa và tình trạng thiết bị.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Tỷ lệ hoàn thành bảo trì hàng tháng</h3>
+                <canvas id="maintenanceCompletionChart" width="400" height="200"></canvas>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Thời gian sửa chữa trung bình</h3>
+                <canvas id="repairTimeChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm p-6 mt-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Báo cáo tình trạng thiết bị</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại thiết bị</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng số</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đang hoạt động</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cần bảo trì</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cần sửa chữa</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Máy chiếu</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">25</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">20</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2</td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Máy tính</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">50</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">45</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

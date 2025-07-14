@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CMC University - Báo cáo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    <script>
+        window.onload = function () {
+            const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
+
+            if (!userName || !userRole) {
+                alert("Bạn chưa đăng nhập!");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (userRole !== 'Admin') {
+                alert("Bạn không có quyền truy cập trang quản trị!");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('userNameNav').innerText = userName;
+            document.getElementById('userRoleNav').innerText = userRole;
+
+            // Sample Chart for Reports Page (can be expanded)
+            const reportCtx = document.getElementById('reportChart').getContext('2d');
+            new Chart(reportCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
+                    datasets: [{
+                        label: 'Số lượng yêu cầu',
+                        data: [12, 19, 3, 5, 2, 3],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        };
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-900">CMC University - Admin Panel</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-user-circle text-gray-400 text-lg"></i>
+                    <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800" id="userRoleNav">Admin</span>
+                </div>
+                <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="flex">
+    <div class="w-64 bg-white shadow-sm min-h-screen">
+        <div class="p-4">
+            <nav class="space-y-2">
+                <a href="dashboard-admin.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Tổng quan
+                </a>
+                <a href="users.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-users mr-3"></i>
+                    Quản lý người dùng
+                </a>
+                <a href="equipments.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-laptop mr-3"></i>
+                    Quản lý thiết bị
+                </a>
+                <a href="requests.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    Quản lý yêu cầu
+                </a>
+                <a href="reports.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Báo cáo
+                </a>
+                <a href="settings.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-cog mr-3"></i>
+                    Cài đặt hệ thống
+                </a>
+            </nav>
+        </div>
+    </div>
+    <div class="flex-1 p-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Báo cáo hệ thống</h1>
+            <p class="text-gray-600">Tạo và xem các báo cáo thống kê về người dùng, thiết bị và yêu cầu.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Tạo báo cáo mới</h3>
+                <form class="space-y-4">
+                    <div>
+                        <label for="reportType" class="block text-sm font-medium text-gray-700">Loại báo cáo</label>
+                        <select id="reportType" name="reportType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option>Báo cáo người dùng</option>
+                            <option>Báo cáo thiết bị</option>
+                            <option>Báo cáo yêu cầu</option>
+                            <option>Báo cáo hoạt động</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="dateRange" class="block text-sm font-medium text-gray-700">Khoảng thời gian</label>
+                        <select id="dateRange" name="dateRange" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option>Hàng tuần</option>
+                            <option>Hàng tháng</option>
+                            <option>Hàng quý</option>
+                            <option>Hàng năm</option>
+                            <option>Tùy chỉnh</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-file-export mr-2"></i>
+                            Xuất báo cáo
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Biểu đồ báo cáo</h3>
+                <canvas id="reportChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Các báo cáo gần đây</h3>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-md">
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Báo cáo hoạt động tháng 6/2025</p>
+                        <p class="text-xs text-gray-500">Người tạo: Admin - Ngày tạo: 2025-07-01</p>
+                    </div>
+                    <a href="#" class="text-blue-600 hover:text-blue-900">
+                        <i class="fas fa-download mr-1"></i> Tải về
+                    </a>
+                </div>
+                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-md">
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Báo cáo tình trạng thiết bị quý 2/2025</p>
+                        <p class="text-xs text-gray-500">Người tạo: Admin - Ngày tạo: 2025-06-30</p>
+                    </div>
+                    <a href="#" class="text-blue-600 hover:text-blue-900">
+                        <i class="fas fa-download mr-1"></i> Tải về
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

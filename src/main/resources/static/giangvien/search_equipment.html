@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CMC University - Tìm thiết bị</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+  <script>
+    window.onload = function() {
+      const userName = localStorage.getItem('userName');
+      const userRole = localStorage.getItem('userRole');
+      if (!userName || !userRole) {
+        window.location.href = 'login.html';
+        return;
+      }
+      if (userRole !== 'Giảng viên') {
+        window.location.href = 'login.html';
+        return;
+      }
+      document.getElementById('userNameNav').innerText = userName;
+      document.getElementById('userRoleNav').innerText = userRole;
+    };
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/login.html';
+    }
+  </script>
+</head>
+<body class="bg-gray-50">
+<nav class="bg-white shadow-sm border-b">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <h1 class="text-xl font-bold text-gray-900">CMC University - Lecturer Panel</h1>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-user-circle text-gray-400 text-lg"></i>
+          <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800" id="userRoleNav">Giảng viên</span>
+        </div>
+        <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="flex">
+  <div class="w-64 bg-white shadow-sm min-h-screen">
+    <div class="p-4">
+      <nav class="space-y-2">
+        <a href="dashboard-giangvien.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+          <i class="fas fa-tachometer-alt mr-3"></i>
+          Tổng quan
+        </a>
+        <a href="search_equipment.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+          <i class="fas fa-search mr-3"></i>
+          Tìm thiết bị
+        </a>
+        <a href="submit_borrow_request.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+          <i class="fas fa-plus mr-3"></i>
+          Gửi yêu cầu mượn thiết bị
+        </a>
+        <a href="my_requests.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+          <i class="fas fa-file-alt mr-3"></i>
+          Yêu cầu của tôi
+        </a>
+        <a href="borrow_history.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+          <i class="fas fa-history mr-3"></i>
+          Lịch sử
+        </a>
+        <a href="lecturer_profile.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+          <i class="fas fa-user mr-3"></i>
+          Hồ sơ
+        </a>
+      </nav>
+    </div>
+  </div>
+  <div class="flex-1 p-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Tìm thiết bị</h1>
+      <p class="text-gray-600">Tìm kiếm các thiết bị có sẵn trong hệ thống.</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="flex items-center space-x-4 mb-4">
+        <input type="text" placeholder="Tìm kiếm theo tên, loại thiết bị..." class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+        <button class="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <i class="fas fa-search mr-2"></i>
+          Tìm kiếm
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên thiết bị</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tình trạng</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vị trí</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+          </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Máy chiếu Epson EB-X49</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Máy chiếu</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sẵn sàng</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Phòng A101</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <a href="#" class="text-blue-600 hover:text-blue-900">Yêu cầu mượn</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Laptop Dell Latitude 7420</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Máy tính</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Đang mượn</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Không có sẵn</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <span class="text-gray-400">Không khả dụng</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Microphone Rode NT1</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Microphone</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sẵn sàng</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Phòng thu âm</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <a href="#" class="text-blue-600 hover:text-blue-900">Yêu cầu mượn</a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
