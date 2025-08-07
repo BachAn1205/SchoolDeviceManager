@@ -14,23 +14,26 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/",
                                 "/index.html",
                                 "/login.html",
                                 "/register.html",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/static/**",
-                                "/admin/**",
-                                "/giangvien/**",
-                                "/kythuatvien/**",
-                                "/nhanvien/**",
-                                "/sinhvien/**",
                                 "/api/auth/register",
                                 "/api/auth/login",
-                                "/favicon.ico"
+                                "/favicon.ico",
+                                "/admin/**",
+                                "/giangvien/**",
+                                "/nhanvien/**",
+                                "/sinhvien/**"
                         ).permitAll()
                         .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login.html")
+                        .permitAll()
                 )
                 .logout(logout -> logout.permitAll());
 
