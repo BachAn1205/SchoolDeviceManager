@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CMC University - Hồ sơ</title>
+    <title>CMC University - Hồ sơ giảng viên</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
@@ -14,22 +14,14 @@
         window.onload = function() {
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
-            if (!userName || !userRole) {
-                window.location.href = 'login.html';
-                return;
+            if (userName) {
+                const el = document.getElementById('userNameNav');
+                if (el) el.innerText = userName;
             }
-            if (userRole !== 'Giảng viên') {
-                window.location.href = 'login.html';
-                return;
+            if (userRole) {
+                const elr = document.getElementById('userRoleNav');
+                if (elr) elr.innerText = userRole;
             }
-            document.getElementById('userNameNav').innerText = userName;
-            document.getElementById('userRoleNav').innerText = userRole;
-
-            // Example data for profile
-            document.getElementById('profileName').value = userName;
-            document.getElementById('profileEmail').value = "giangvien.sample@cmc.edu.vn";
-            document.getElementById('profilePhone').value = "0901234567";
-            document.getElementById('profileRole').value = userRole;
         };
         function logout() {
             localStorage.clear();
@@ -65,27 +57,27 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a href="dashboard-giangvien.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/dashboard-giangvien.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
-                <a href="search_equipment.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/search_equipment}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-search mr-3"></i>
                     Tìm thiết bị
                 </a>
-                <a href="submit_borrow_request.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/submit_borrow_request}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-plus mr-3"></i>
                     Gửi yêu cầu mượn thiết bị
                 </a>
-                <a href="my_requests.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/my_requests}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-file-alt mr-3"></i>
                     Yêu cầu của tôi
                 </a>
-                <a href="borrow_history.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/borrow_history}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-history mr-3"></i>
                     Lịch sử
                 </a>
-                <a href="lecturer_profile.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                <a th:href="@{/giangvien/lecturer_profile}" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
                     <i class="fas fa-user mr-3"></i>
                     Hồ sơ
                 </a>

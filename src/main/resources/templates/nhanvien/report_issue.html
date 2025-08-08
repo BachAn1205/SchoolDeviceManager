@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CMC University - Yêu cầu thiết bị</title>
+    <title>CMC University - Báo cáo sự cố</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
@@ -59,15 +59,15 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a href="dashboard-nhanvien.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a href="../../static/nhanvien/dashboard-nhanvien.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
-                <a href="request_equipment.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                <a href="request_equipment.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-laptop-medical mr-3"></i>
                     Yêu cầu thiết bị
                 </a>
-                <a href="report_issue.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a href="report_issue.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
                     <i class="fas fa-exclamation-triangle mr-3"></i>
                     Báo cáo sự cố
                 </a>
@@ -84,42 +84,44 @@
     </div>
     <div class="flex-1 p-8">
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Yêu cầu thiết bị mới</h1>
-            <p class="text-gray-600">Điền thông tin để gửi yêu cầu thiết bị.</p>
+            <h1 class="text-3xl font-bold text-gray-900">Báo cáo sự cố thiết bị</h1>
+            <p class="text-gray-600">Mô tả sự cố bạn đang gặp phải để chúng tôi có thể hỗ trợ.</p>
         </div>
 
         <div class="bg-white rounded-lg shadow-sm p-6">
             <form>
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="equipmentType" class="block text-sm font-medium text-gray-700">Loại thiết bị</label>
-                        <select id="equipmentType" name="equipmentType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                            <option>Chọn loại thiết bị</option>
-                            <option>Máy tính xách tay</option>
-                            <option>Máy tính để bàn</option>
-                            <option>Máy chiếu</option>
-                            <option>Máy in</option>
-                            <option>Màn hình</option>
+                        <label for="deviceLocation" class="block text-sm font-medium text-gray-700">Vị trí thiết bị</label>
+                        <input type="text" id="deviceLocation" name="deviceLocation" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ví dụ: Phòng B203, Tầng 3">
+                    </div>
+                    <div>
+                        <label for="issueType" class="block text-sm font-medium text-gray-700">Loại sự cố</label>
+                        <select id="issueType" name="issueType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option>Chọn loại sự cố</option>
+                            <option>Lỗi phần cứng</option>
+                            <option>Lỗi phần mềm</option>
+                            <option>Lỗi mạng/kết nối</option>
+                            <option>Không hoạt động</option>
                             <option>Khác</option>
                         </select>
                     </div>
-                    <div>
-                        <label for="quantity" class="block text-sm font-medium text-gray-700">Số lượng</label>
-                        <input type="number" id="quantity" name="quantity" min="1" value="1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <div class="sm:col-span-2">
+                        <label for="issueDescription" class="block text-sm font-medium text-gray-700">Mô tả chi tiết sự cố</label>
+                        <textarea id="issueDescription" name="issueDescription" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Mô tả chi tiết vấn đề bạn đang gặp phải, các bước để tái hiện lỗi (nếu có)..."></textarea>
                     </div>
                     <div class="sm:col-span-2">
-                        <label for="reason" class="block text-sm font-medium text-gray-700">Lý do yêu cầu</label>
-                        <textarea id="reason" name="reason" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Mô tả chi tiết lý do bạn cần thiết bị này..."></textarea>
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label for="notes" class="block text-sm font-medium text-gray-700">Ghi chú thêm (Tùy chọn)</label>
-                        <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Mọi thông tin bổ sung hữu ích..."></textarea>
+                        <label for="contactMethod" class="block text-sm font-medium text-gray-700">Phương thức liên hệ ưa thích</label>
+                        <select id="contactMethod" name="contactMethod" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option>Email</option>
+                            <option>Điện thoại</option>
+                        </select>
                     </div>
                 </div>
                 <div class="mt-6 flex justify-end">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <i class="fas fa-paper-plane mr-2"></i>
-                        Gửi yêu cầu
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        <i class="fas fa-bell mr-2"></i>
+                        Gửi báo cáo sự cố
                     </button>
                 </div>
             </form>

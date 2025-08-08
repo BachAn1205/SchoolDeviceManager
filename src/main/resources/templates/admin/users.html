@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,23 +12,14 @@
     </style>
     <script>
         window.onload = function () {
+            // Authentication sẽ được xử lý bởi Spring Security
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
 
-            if (!userName || !userRole) {
-                alert("Bạn chưa đăng nhập!");
-                window.location.href = 'login.html';
-                return;
+            if (userName && userRole) {
+                document.getElementById('userNameNav').innerText = userName;
+                document.getElementById('userRoleNav').innerText = userRole;
             }
-
-            if (userRole !== 'Admin') {
-                alert("Bạn không có quyền truy cập trang quản trị!");
-                window.location.href = 'login.html';
-                return;
-            }
-
-            document.getElementById('userNameNav').innerText = userName;
-            document.getElementById('userRoleNav').innerText = userRole;
         };
 
         function logout() {
@@ -65,27 +56,27 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a href="dashboard-admin.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/admin/dashboard-admin.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
-                <a href="users.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                <a th:href="@{/admin/users}" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
                     <i class="fas fa-users mr-3"></i>
                     Quản lý người dùng
                 </a>
-                <a href="equipments.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/admin/equipments}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-laptop mr-3"></i>
                     Quản lý thiết bị
                 </a>
-                <a href="requests.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/admin/requests}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-file-alt mr-3"></i>
                     Quản lý yêu cầu
                 </a>
-                <a href="reports.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/admin/reports}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-chart-bar mr-3"></i>
                     Báo cáo
                 </a>
-                <a href="settings.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/admin/settings}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-cog mr-3"></i>
                     Cài đặt hệ thống
                 </a>

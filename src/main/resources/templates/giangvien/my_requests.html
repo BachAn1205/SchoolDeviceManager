@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CMC University - Yêu cầu mượn của tôi</title>
+    <title>CMC University - Yêu cầu của tôi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
@@ -14,16 +14,14 @@
         window.onload = function() {
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
-            if (!userName || !userRole) {
-                window.location.href = 'login.html';
-                return;
+            if (userName) {
+                const el = document.getElementById('userNameNav');
+                if (el) el.innerText = userName;
             }
-            if (userRole !== 'Sinh viên') {
-                window.location.href = 'login.html';
-                return;
+            if (userRole) {
+                const elr = document.getElementById('userRoleNav');
+                if (elr) elr.innerText = userRole;
             }
-            document.getElementById('userNameNav').innerText = userName;
-            document.getElementById('userRoleNav').innerText = userRole;
         };
         function logout() {
             localStorage.clear();
@@ -37,7 +35,7 @@
         <div class="flex justify-between h-16">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <h1 class="text-xl font-bold text-gray-900">CMC University - Student Panel</h1>
+                    <h1 class="text-xl font-bold text-gray-900">CMC University - Lecturer Panel</h1>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
@@ -46,7 +44,7 @@
                     <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800" id="userRoleNav">Sinh viên</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800" id="userRoleNav">Giảng viên</span>
                 </div>
                 <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-sign-out-alt"></i>
@@ -59,23 +57,27 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a href="dashboard-sinhvien.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/dashboard-giangvien.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
-                <a href="find_equipment.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/search_equipment}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-search mr-3"></i>
                     Tìm thiết bị
                 </a>
-                <a href="my_requests_student.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                <a th:href="@{/giangvien/submit_borrow_request}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-plus mr-3"></i>
+                    Gửi yêu cầu mượn thiết bị
+                </a>
+                <a th:href="@{/giangvien/my_requests}" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
                     <i class="fas fa-file-alt mr-3"></i>
                     Yêu cầu của tôi
                 </a>
-                <a href="borrow_history.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/borrow_history}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-history mr-3"></i>
                     Lịch sử
                 </a>
-                <a href="student_profile.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/lecturer_profile}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-user mr-3"></i>
                     Hồ sơ
                 </a>
@@ -84,65 +86,48 @@
     </div>
     <div class="flex-1 p-8">
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Yêu cầu mượn của tôi</h1>
-            <p class="text-gray-600">Theo dõi trạng thái các yêu cầu mượn thiết bị bạn đã gửi.</p>
+            <h1 class="text-3xl font-bold text-gray-900">Yêu cầu của tôi</h1>
+            <p class="text-gray-600">Xem tình trạng và quản lý các yêu cầu mượn thiết bị bạn đã gửi.</p>
         </div>
 
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div class="flex items-center space-x-4 mb-4">
-                <input type="text" placeholder="Tìm kiếm theo mã yêu cầu, tên thiết bị..." class="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                <button class="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                    <i class="fas fa-search mr-2"></i>
-                    Tìm kiếm
-                </button>
-            </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã yêu cầu</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thiết bị</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày gửi</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày cần</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày mượn</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày trả dự kiến</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">REQSTUD001</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">REQGV001</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Máy chiếu Epson EB-X49</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-12</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-15</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-17</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Đang chờ</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Hủy</a>
+                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-4">Xem chi tiết</a>
+                            <a href="#" class="text-red-600 hover:text-red-900">Hủy</a>
                         </td>
                     </tr>
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">REQSTUD002</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Laptop Dell XPS 15</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-10</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-10</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Đang mượn</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Chi tiết</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">REQSTUD003</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Micrô Rode NT-USB Mini</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-05</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">REQGV002</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Laptop Dell Latitude 7420</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-01</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-05</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đã trả</span>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đã duyệt</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Chi tiết</a>
+                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-4">Xem chi tiết</a>
+                            <a href="#" class="text-red-600 hover:text-red-900">Trả</a>
                         </td>
                     </tr>
                     </tbody>

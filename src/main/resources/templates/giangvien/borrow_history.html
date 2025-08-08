@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CMC University - Yêu cầu của tôi</title>
+    <title>CMC University - Lịch sử mượn</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
@@ -14,16 +14,14 @@
         window.onload = function() {
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
-            if (!userName || !userRole) {
-                window.location.href = 'login.html';
-                return;
+            if (userName) {
+                const el = document.getElementById('userNameNav');
+                if (el) el.innerText = userName;
             }
-            if (userRole !== 'Giảng viên') {
-                window.location.href = 'login.html';
-                return;
+            if (userRole) {
+                const elr = document.getElementById('userRoleNav');
+                if (elr) elr.innerText = userRole;
             }
-            document.getElementById('userNameNav').innerText = userName;
-            document.getElementById('userRoleNav').innerText = userRole;
         };
         function logout() {
             localStorage.clear();
@@ -32,6 +30,7 @@
     </script>
 </head>
 <body class="bg-gray-50">
+
 <nav class="bg-white shadow-sm border-b">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -59,27 +58,27 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a href="dashboard-giangvien.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/dashboard-giangvien.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
-                <a href="search_equipment.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/search_equipment}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-search mr-3"></i>
                     Tìm thiết bị
                 </a>
-                <a href="submit_borrow_request.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/submit_borrow_request}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-plus mr-3"></i>
                     Gửi yêu cầu mượn thiết bị
                 </a>
-                <a href="my_requests.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                <a th:href="@{/giangvien/my_requests}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-file-alt mr-3"></i>
                     Yêu cầu của tôi
                 </a>
-                <a href="borrow_history.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/borrow_history}" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
                     <i class="fas fa-history mr-3"></i>
                     Lịch sử
                 </a>
-                <a href="lecturer_profile.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/giangvien/lecturer_profile}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-user mr-3"></i>
                     Hồ sơ
                 </a>
@@ -88,8 +87,8 @@
     </div>
     <div class="flex-1 p-8">
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Yêu cầu của tôi</h1>
-            <p class="text-gray-600">Xem tình trạng và quản lý các yêu cầu mượn thiết bị bạn đã gửi.</p>
+            <h1 class="text-3xl font-bold text-gray-900">Lịch sử mượn thiết bị</h1>
+            <p class="text-gray-600">Xem lại tất cả các yêu cầu mượn thiết bị đã hoàn thành hoặc bị từ chối của bạn.</p>
         </div>
 
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -100,36 +99,34 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã yêu cầu</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thiết bị</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày mượn</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày trả dự kiến</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày trả</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái cuối cùng</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">REQGV001</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Máy chiếu Epson EB-X49</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-15</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-17</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Đang chờ</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-4">Xem chi tiết</a>
-                            <a href="#" class="text-red-600 hover:text-red-900">Hủy</a>
-                        </td>
-                    </tr>
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">REQGV002</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Laptop Dell Latitude 7420</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-01</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-05</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đã duyệt</span>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Đã trả</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-4">Xem chi tiết</a>
-                            <a href="#" class="text-red-600 hover:text-red-900">Trả</a>
+                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Xem chi tiết</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">REQGV003</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Máy ảnh Canon EOS 90D</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-20</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-06-22</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Đã từ chối</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Xem chi tiết</a>
                         </td>
                     </tr>
                     </tbody>

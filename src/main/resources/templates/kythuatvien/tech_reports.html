@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -13,18 +13,13 @@
     </style>
     <script>
         window.onload = function() {
+            // Auth xử lý phía server; chỉ gán UI nếu có dữ liệu local
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
-            if (!userName || !userRole) {
-                window.location.href = 'login.html';
-                return;
+            if (userName && userRole) {
+                document.getElementById('userNameNav').innerText = userName;
+                document.getElementById('userRoleNav').innerText = userRole;
             }
-            if (userRole !== 'Kỹ thuật viên') {
-                window.location.href = 'login.html';
-                return;
-            }
-            document.getElementById('userNameNav').innerText = userName;
-            document.getElementById('userRoleNav').innerText = userRole;
 
             // Sample Chart for Maintenance Completion Rate
             const maintenanceCompletionCtx = document.getElementById('maintenanceCompletionChart').getContext('2d');
@@ -127,23 +122,23 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a href="dashboard-kythuatvien.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/dashboard-kythuatvien.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
-                <a href="maintenance_schedule.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/maintenance_schedule}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tools mr-3"></i>
                     Lịch bảo trì
                 </a>
-                <a href="repair_requests.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/repair_requests}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-wrench mr-3"></i>
                     Sửa chữa
                 </a>
-                <a href="equipment_management_tech.html" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/equipment_management}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-laptop mr-3"></i>
                     Thiết bị
                 </a>
-                <a href="tech_reports.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                <a th:href="@{/kythuatvien/tech_reports}" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
                     <i class="fas fa-chart-bar mr-3"></i>
                     Báo cáo
                 </a>
