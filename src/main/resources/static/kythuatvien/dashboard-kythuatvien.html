@@ -22,7 +22,7 @@
                 return;
             }
             if (userRole !== 'Kỹ thuật viên') {
-                window.location.href = 'login.html';
+                window.location.href = '/login.html';
                 return;
             }
             document.getElementById('userNameNav').innerText = userName;
@@ -127,21 +127,21 @@
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
-                <a href="/kythuatvien/equipment_management" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
-                    <i class="fas fa-tools mr-3"></i>
-                    Quản lý thiết bị
-                </a>
                 <a href="/kythuatvien/maintenance_schedule" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-calendar-alt mr-3"></i>
                     Lịch bảo trì
                 </a>
-                <a href="/kythuatvien/issue_reports" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
-                    <i class="fas fa-exclamation-triangle mr-3"></i>
-                    Báo cáo sự cố
+                <a href="/kythuatvien/repair_requests" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-wrench mr-3"></i>
+                    Sửa chữa
                 </a>
-                <a href="/kythuatvien/technician_profile" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
-                    <i class="fas fa-user mr-3"></i>
-                    Hồ sơ
+                <a href="/kythuatvien/equipment_management" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-laptop mr-3"></i>
+                    Thiết bị
+                </a>
+                <a href="/kythuatvien/tech_reports" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Báo cáo
                 </a>
             </nav>
         </div>

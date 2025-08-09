@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -22,7 +23,7 @@
         };
         function logout() {
             localStorage.clear();
-            window.location.href = 'login.html';
+            window.location.href = '/login.html';
         }
     </script>
 </head>
@@ -54,12 +55,12 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a th:href="@{/static/kythuatvien/dashboard-kythuatvien.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/dashboard-kythuatvien.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
                 <a th:href="@{/kythuatvien/maintenance_schedule}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
-                    <i class="fas fa-tools mr-3"></i>
+                    <i class="fas fa-calendar-alt mr-3"></i>
                     Lịch bảo trì
                 </a>
                 <a th:href="@{/kythuatvien/repair_requests}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
@@ -137,4 +138,4 @@
     </div>
 </div>
 </body>
-</html>>
+</html>>-->

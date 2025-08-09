@@ -27,7 +27,8 @@ public class SecurityConfig {
                                 "/admin/**",
                                 "/giangvien/**",
                                 "/nhanvien/**",
-                                "/sinhvien/**"
+                                "/sinhvien/**",
+                                "/kythuatvien/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -39,4 +40,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }

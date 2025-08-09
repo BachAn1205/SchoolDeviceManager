@@ -12,7 +12,7 @@ public class KyThuatVienController {
     @GetMapping("/equipment_management")
     public String equipmentManagement(Model model) {
         // Match existing template file equipment_management_tech.html
-        return "kythuatvien/equipment_management_tech";
+        return "kythuatvien/equipment_management";
     }
 
     @GetMapping("/maintenance_schedule")

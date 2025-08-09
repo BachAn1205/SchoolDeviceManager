@@ -24,7 +24,7 @@
 
         function logout() {
             localStorage.clear();
-            window.location.href = 'login.html';
+            window.location.href = '/login.html';
         }
     </script>
 </head>
@@ -92,9 +92,9 @@
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">Danh sách người dùng</h3>
-                <a href="users.html?action=add" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <a th:href="@{/register.html}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     <i class="fas fa-user-plus mr-2"></i>
-                    Thêm người dùng mới
+                    Đăng ký người dùng mới
                 </a>
             </div>
             <div class="overflow-x-auto">
@@ -109,28 +109,25 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Nguyễn Văn A</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">vana@cmc.edu.vn</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">0912345678</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sinh viên</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-4">Sửa</a>
-                            <a href="#" class="text-red-600 hover:text-red-900">Xóa</a>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(users)}">
+                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Chưa có người dùng nào.</td>
                     </tr>
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Trần Thị B</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">thib@cmc.edu.vn</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">0987654321</td>
+                    <tr th:each="u : ${users}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${u.fullName}">Họ tên</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${u.email}">email@cmc.edu.vn</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${u.phone}">0123456789</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Giảng viên</span>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                  th:text="${u.role}"
+                                  th:classappend="${u.role}=='Admin' ? ' bg-red-100 text-red-800' : (${u.role}=='Giảng viên' ? ' bg-yellow-100 text-yellow-800' : (${u.role}=='Sinh viên' ? ' bg-green-100 text-green-800' : ' bg-gray-100 text-gray-800'))">
+                                Vai trò
+                            </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-4">Sửa</a>
-                            <a href="#" class="text-red-600 hover:text-red-900">Xóa</a>
+                            <a th:href="@{'/admin/users/edit/' + ${u.userID}}" class="text-indigo-600 hover:text-indigo-900 mr-4">Sửa</a>
+                            <form th:action="@{'/admin/users/delete/' + ${u.userID}}" method="post" class="inline" onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này?');">
+                                <button type="submit" class="text-red-600 hover:text-red-900">Xóa</button>
+                            </form>
                         </td>
                     </tr>
                     </tbody>
