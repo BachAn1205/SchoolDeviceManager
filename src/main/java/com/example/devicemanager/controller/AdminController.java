@@ -1,23 +1,38 @@
 package com.example.devicemanager.controller;
 
 import com.example.cuoikyjavaa.dto.UserDTO;
+import com.example.cuoikyjavaa.model.Equipment;
+import com.example.cuoikyjavaa.model.LoaiThietBi;
+import com.example.cuoikyjavaa.repository.EquipmentRepository;
+import com.example.cuoikyjavaa.repository.LoaiThietBiRepository;
 import com.example.cuoikyjavaa.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
     private final UserRepository userRepository;
+    private final EquipmentRepository equipmentRepository;
+    private final LoaiThietBiRepository loaiThietBiRepository;
 
-    public AdminController(UserRepository userRepository) {
+    public AdminController(UserRepository userRepository, 
+                          EquipmentRepository equipmentRepository,
+                          LoaiThietBiRepository loaiThietBiRepository) {
         this.userRepository = userRepository;
+        this.equipmentRepository = equipmentRepository;
+        this.loaiThietBiRepository = loaiThietBiRepository;
     }
 
     @GetMapping("/users")
@@ -37,8 +52,77 @@ public class AdminController {
         return "admin/users";
     }
 
+    // ========== QUẢN LÝ THIẾT BỊ ==========
+    
+    @GetMapping("/equipments")
+    public String listEquipments(
+            Model model,
+            @RequestParam(value = "page", required = false) Optional<Integer> page,
+            @RequestParam(value = "size", required = false) Optional<Integer> size) {
+        
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(10); // 10 bản ghi mỗi trang
+        
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+        Page<Equipment> equipmentPage = equipmentRepository.findAll(pageable);
+        
+        // Thêm đối tượng equipment mới vào model cho form thêm mới
+        if (!model.containsAttribute("equipment")) {
+            model.addAttribute("equipment", new Equipment());
+        }
+        
+        model.addAttribute("equipmentPage", equipmentPage);
+        model.addAttribute("loaiThietBiList", loaiThietBiRepository.findAll());
+        
+        int totalPages = equipmentPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            model.addAttribute("pageNumbers", pageNumbers);
+        }
+        
+        return "admin/equipments";
+    }
+    
+    @GetMapping("/equipments/add")
+    public String showAddForm(Model model) {
+        model.addAttribute("equipment", new Equipment());
+        model.addAttribute("loaiThietBiList", loaiThietBiRepository.findAll());
+        return "admin/equipments :: equipmentForm";
+    }
+    
+    @PostMapping("/equipments/save")
+    public String saveEquipment(@ModelAttribute("equipment") Equipment equipment, 
+                              RedirectAttributes redirectAttributes) {
+        equipmentRepository.save(equipment);
+        redirectAttributes.addFlashAttribute("message", "Lưu thiết bị thành công!");
+        return "redirect:/admin/equipments";
+    }
+    
+    @GetMapping("/equipments/edit/{id}")
+    public String showEditForm(@PathVariable("id") Integer id, Model model) {
+        Equipment equipment = equipmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("ID thiết bị không hợp lệ: " + id));
+        model.addAttribute("equipment", equipment);
+        model.addAttribute("loaiThietBiList", loaiThietBiRepository.findAll());
+        return "admin/equipments :: equipmentForm";
+    }
+    
+    @GetMapping("/equipments/delete/{id}")
+    public String deleteEquipment(@PathVariable("id") Integer id, 
+                                RedirectAttributes redirectAttributes) {
+        try {
+            equipmentRepository.deleteById(id);
+            redirectAttributes.addFlashAttribute("message", "Xóa thiết bị thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Không thể xóa thiết bị. Có thể thiết bị đang được sử dụng.");
+        }
+        return "redirect:/admin/equipments";
+    }
+    
     @GetMapping("/users/edit/{id}")
-    public String editUserForm(@org.springframework.web.bind.annotation.PathVariable("id") Integer id, Model model) {
+    public String editUserForm(@PathVariable("id") Integer id, Model model) {
         var user = userRepository.findById(id).orElse(null);
         if (user == null) {
             return "redirect:/admin/users";
@@ -78,10 +162,6 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    @GetMapping("/equipments")
-    public String equipments(Model model) {
-        return "admin/equipments";
-    }
 
     @GetMapping("/requests")
     public String requests(Model model) {

@@ -12,18 +12,27 @@
     </style>
     <script>
         window.onload = function () {
-            // Authentication sẽ được xử lý bởi Spring Security
+            // Kiểm tra xác thực
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
-            if (userName && userRole) {
-                document.getElementById('userNameNav').innerText = userName;
-                document.getElementById('userRoleNav').innerText = userRole;
+            
+            // Nếu chưa đăng nhập hoặc không phải admin -> chuyển về trang đăng nhập
+            if (!userName || !userRole || userRole !== 'Admin') {
+                alert('Bạn cần đăng nhập với quyền Admin để truy cập trang này!');
+                window.location.href = '/login.html';
+                return;
             }
+            
+            // Cập nhật thông tin người dùng
+            document.getElementById('userNameNav').innerText = userName;
+            document.getElementById('userRoleNav').innerText = userRole;
         };
 
         function logout() {
-            localStorage.clear();
-            window.location.href = 'login.html';
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                localStorage.clear();
+                window.location.href = '/login.html';
+            }
         }
     </script>
 </head>
@@ -83,6 +92,14 @@
         </div>
     </div>
     <div class="flex-1 p-8">
+        <!-- Thông báo -->
+        <div th:if="${message}" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            <span th:text="${error}"></span>
+        </div>
+
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Quản lý thiết bị</h1>
             <p class="text-gray-600">Quản lý thông tin và tình trạng của các thiết bị trong hệ thống.</p>
@@ -91,10 +108,10 @@
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">Danh sách thiết bị</h3>
-                <a th:href="@{/admin/equipments(action=add)}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <button onclick="showAddModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                     <i class="fas fa-plus mr-2"></i>
                     Thêm thiết bị mới
-                </a>
+                </button>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -109,37 +126,246 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">E001</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Máy chiếu Epson EB-X49</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Máy chiếu</td>
+                    <tr th:each="equipment : ${equipmentPage.content}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${equipment.maThietBi}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${equipment.tenThietBi}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${equipment.loaiThietBi.tenLoai}"></td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sẵn sàng</span>
+                            <span th:class="'px-2 inline-flex text-xs leading-5 font-semibold rounded-full ' + 
+                                (${equipment.trangThai} == 'Sẵn sàng' ? 'bg-green-100 text-green-800' : 
+                                (${equipment.trangThai} == 'Đang sử dụng' ? 'bg-yellow-100 text-yellow-800' : 
+                                'bg-red-100 text-red-800'))" 
+                                th:text="${equipment.trangThai}">
+                            </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Phòng A101</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${equipment.viTri}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-4">Sửa</a>
-                            <a href="#" class="text-red-600 hover:text-red-900">Xóa</a>
+                            <a href="#" th:onclick="'showEditModal(' + ${equipment.id} + ')'" class="text-indigo-600 hover:text-indigo-900 mr-4">Sửa</a>
+                            <a href="#" th:onclick="'confirmDelete(' + ${equipment.id} + ')'" class="text-red-600 hover:text-red-900">Xóa</a>
                         </td>
                     </tr>
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">E002</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Laptop Dell Latitude 7420</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Máy tính</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Đang sử dụng</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Kho thiết bị</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-4">Sửa</a>
-                            <a href="#" class="text-red-600 hover:text-red-900">Xóa</a>
-                        </td>
+                    <tr th:if="${equipmentPage.totalElements == 0}">
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Không có thiết bị nào</td>
                     </tr>
                     </tbody>
                 </table>
+                
+                <!-- Phân trang -->
+                <div class="mt-4 flex items-center justify-between" th:if="${equipmentPage.totalPages > 1}">
+                    <div class="flex-1 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Hiển thị <span class="font-medium" th:text="${equipmentPage.number * equipmentPage.size + 1}"></span>
+                                đến <span class="font-medium" th:text="${(equipmentPage.number * equipmentPage.size) + equipmentPage.numberOfElements}"></span>
+                                trong tổng số <span class="font-medium" th:text="${equipmentPage.totalElements}"></span> bản ghi
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <a th:if="${!equipmentPage.first}" 
+                                   th:href="@{/admin/equipments(page=0, size=${equipmentPage.size})}" 
+                                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Đầu tiên</span>
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                                <a th:if="${!equipmentPage.first}" 
+                                   th:href="@{/admin/equipments(page=${equipmentPage.number-1}, size=${equipmentPage.size})}" 
+                                   class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Trước</span>
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                                
+                                <a th:each="i : ${#numbers.sequence(1, equipmentPage.totalPages)}" 
+                                   th:href="@{/admin/equipments(page=${i-1}, size=${equipmentPage.size})}" 
+                                   th:class="${i-1 == equipmentPage.number ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}" 
+                                   class="relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    <span th:text="${i}"></span>
+                                </a>
+                                
+                                <a th:if="${!equipmentPage.last}" 
+                                   th:href="@{/admin/equipments(page=${equipmentPage.number+1}, size=${equipmentPage.size})}" 
+                                   class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Tiếp theo</span>
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                                <a th:if="${!equipmentPage.last}" 
+                                   th:href="@{/admin/equipments(page=${equipmentPage.totalPages-1}, size=${equipmentPage.size})}" 
+                                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Cuối cùng</span>
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Form -->
+        <div id="equipmentModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                <span id="modalTitle">Thêm thiết bị mới</span>
+                            </h3>
+                            <div class="mt-2">
+                                <form id="equipmentForm" th:action="@{/admin/equipments/save}" th:object="${equipment}" method="post" class="space-y-4">
+                                    <input type="hidden" th:field="*{id}" />
+                                    
+                                    <div>
+                                        <label for="maThietBi" class="block text-sm font-medium text-gray-700">Mã thiết bị</label>
+                                        <input type="text" th:field="*{maThietBi}" id="maThietBi" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="tenThietBi" class="block text-sm font-medium text-gray-700">Tên thiết bị</label>
+                                        <input type="text" th:field="*{tenThietBi}" id="tenThietBi" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="loaiThietBi" class="block text-sm font-medium text-gray-700">Loại thiết bị</label>
+                                        <select th:field="*{loaiThietBi}" id="loaiThietBi" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                            <option th:each="loai : ${loaiThietBiList}" 
+                                                    th:value="${loai.id}" 
+                                                    th:text="${loai.tenLoai}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="trangThai" class="block text-sm font-medium text-gray-700">Trạng thái</label>
+                                        <select th:field="*{trangThai}" id="trangThai" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                            <option value="Sẵn sàng">Sẵn sàng</option>
+                                            <option value="Đang sử dụng">Đang sử dụng</option>
+                                            <option value="Đang bảo trì">Đang bảo trì</option>
+                                            <option value="Hỏng">Hỏng</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="viTri" class="block text-sm font-medium text-gray-700">Vị trí</label>
+                                        <input type="text" th:field="*{viTri}" id="viTri" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="ngayNhap" class="block text-sm font-medium text-gray-700">Ngày nhập</label>
+                                        <input type="date" th:field="*{ngayNhap}" id="ngayNhap" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </div>
+                                    
+                                    <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm">
+                                            Lưu
+                                        </button>
+                                        <button type="button" onclick="closeModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">
+                                            Hủy
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Xác nhận xóa -->
+        <div id="deleteConfirmModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-exclamation text-red-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Xác nhận xóa
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">
+                                    Bạn có chắc chắn muốn xóa thiết bị này? Hành động này không thể hoàn tác.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                        <a id="confirmDeleteBtn" href="#" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Xóa
+                        </a>
+                        <button type="button" onclick="closeDeleteModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                            Hủy
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    
+    <script>
+        // Hiển thị modal thêm mới
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = 'Thêm thiết bị mới';
+            document.getElementById('equipmentForm').action = '/admin/equipments/save';
+            document.getElementById('equipmentForm').reset();
+            document.getElementById('equipmentModal').classList.remove('hidden');
+        }
+        
+        // Hiển thị modal chỉnh sửa
+        function showEditModal(id) {
+            document.getElementById('modalTitle').textContent = 'Chỉnh sửa thiết bị';
+            document.getElementById('equipmentForm').action = '/admin/equipments/save';
+            
+            // Tải dữ liệu thiết bị và điền vào form
+            fetch('/admin/equipments/edit/' + id)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const form = doc.querySelector('form');
+                    if (form) {
+                        document.getElementById('equipmentForm').innerHTML = form.innerHTML;
+                    }
+                    document.getElementById('equipmentModal').classList.remove('hidden');
+                });
+        }
+        
+        // Đóng modal
+        function closeModal() {
+            document.getElementById('equipmentModal').classList.add('hidden');
+        }
+        
+        // Hiển thị modal xác nhận xóa
+        function confirmDelete(id) {
+            document.getElementById('confirmDeleteBtn').onclick = function() {
+                window.location.href = '/admin/equipments/delete/' + id;
+            };
+            document.getElementById('deleteConfirmModal').classList.remove('hidden');
+        }
+        
+        // Đóng modal xác nhận xóa
+        function closeDeleteModal() {
+            document.getElementById('deleteConfirmModal').classList.add('hidden');
+        }
+        
+        // Đóng modal khi nhấn bên ngoài
+        window.onclick = function(event) {
+            const modal = document.getElementById('equipmentModal');
+            const deleteModal = document.getElementById('deleteConfirmModal');
+            
+            if (event.target === modal) {
+                closeModal();
+            }
+            
+            if (event.target === deleteModal) {
+                closeDeleteModal();
+            }
+        };
+    </script>
 </div>
 </body>
 </html>
