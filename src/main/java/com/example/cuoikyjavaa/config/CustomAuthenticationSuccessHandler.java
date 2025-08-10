@@ -22,7 +22,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         for (GrantedAuthority grantedAuthority : authorities) {
             String authorityName = grantedAuthority.getAuthority();
             if (authorityName.equals("ROLE_ADMIN")) {
-                redirectUrl = "/admin/users"; // Hoặc dashboard của admin
+                redirectUrl = "/admin/dashboard";
                 break;
             } else if (authorityName.equals("ROLE_GIANGVIEN")) {
                 redirectUrl = "/giangvien/dashboard";
@@ -31,7 +31,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 redirectUrl = "/sinhvien/find_equipment"; // Hoặc dashboard của sinh viên
                 break;
             } else if (authorityName.equals("ROLE_NHANVIEN")) {
-                redirectUrl = "/nhanvien/my_requests"; // Hoặc dashboard của nhân viên
+                redirectUrl = "/nhanvien/dashboard"; // Hoặc dashboard của nhân viên
                 break;
             } else if (authorityName.equals("ROLE_KYTHUATVIEN")) {
                 redirectUrl = "/kythuatvien/equipment_management"; // Hoặc dashboard của kỹ thuật viên

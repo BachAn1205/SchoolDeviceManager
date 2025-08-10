@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CMC University - Employee Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-900">CMC University - Employee Panel</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-user-circle text-gray-400 text-lg"></i>
+                    <span class="text-sm font-medium text-gray-700" th:text="${user.fullName}"></span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800" th:text="${user.role}"></span>
+                </div>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="flex">
+    <div class="w-64 bg-white shadow-sm min-h-screen">
+        <div class="p-4">
+            <nav class="space-y-2">
+                <a th:href="@{/nhanvien/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Tổng quan
+                </a>
+                <a th:href="@{/nhanvien/request_equipment}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-laptop mr-3"></i>
+                    Yêu cầu thiết bị
+                </a>
+                <a th:href="@{/nhanvien/report_issue}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    Báo cáo sự cố
+                </a>
+                <a th:href="@{/nhanvien/my_requests}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-list-alt mr-3"></i>
+                    Yêu cầu của tôi
+                </a>
+                <a th:href="@{/nhanvien/staff_profile}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-user mr-3"></i>
+                    Hồ sơ
+                </a>
+            </nav>
+        </div>
+    </div>
+    <div class="flex-1 p-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Tổng quan nhân viên</h1>
+            <p class="text-gray-600">Chào mừng trở lại bảng điều khiển nhân viên, <span th:text="${user.fullName}"></span>!</p>
+            <div class="mt-2 p-3 bg-purple-50 border border-purple-200 rounded-md">
+                <p class="text-sm text-purple-800">
+                    <i class="fas fa-user mr-2"></i>
+                    Bạn đang đăng nhập với quyền <strong th:text="${user.role}"></strong>.
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-cogs text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Yêu cầu mới</p>
+                        <p class="text-2xl font-bold text-gray-900" th:text="${newRequests}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-yellow-100 p-3 rounded-full">
+                        <i class="fas fa-exclamation-circle text-yellow-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Sự cố đang chờ</p>
+                        <p class="text-2xl font-bold text-gray-900" th:text="${pendingIssues}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Yêu cầu đã hoàn thành</p>
+                        <p class="text-2xl font-bold text-gray-900" th:text="${completedRequests}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Tình trạng yêu cầu của bạn</h3>
+                <div class="relative h-80">
+                    <canvas id="requestStatusChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Phân loại sự cố đã báo cáo</h3>
+                <div class="relative h-80">
+                    <canvas id="issueCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        // Doughnut Chart for Request Status
+        const requestStatusCtx = document.getElementById('requestStatusChart').getContext('2d');
+        new Chart(requestStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Đang chờ', 'Đang xử lý', 'Hoàn thành', 'Bị từ chối'],
+                datasets: [{
+                    data: [
+                        /*[[${pendingStatus}]]*/ 0,
+                        /*[[${processingStatus}]]*/ 0,
+                        /*[[${completedStatus}]]*/ 0,
+                        /*[[${rejectedStatus}]]*/ 0
+                    ],
+                    backgroundColor: ['#F59E0B', '#3B82F6', '#10B981', '#EF4444'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Bar Chart for Issue Categories
+        const issueCategoryCtx = document.getElementById('issueCategoryChart').getContext('2d');
+        new Chart(issueCategoryCtx, {
+            type: 'bar',
+            data: {
+                labels: /*[[${issueLabels}]]*/ [],
+                datasets: [{
+                    label: 'Số lượng sự cố',
+                    data: /*[[${issueData}]]*/ [],
+                    backgroundColor: ['#6366F1', '#EC4899', '#06B6D4', '#EAB308'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

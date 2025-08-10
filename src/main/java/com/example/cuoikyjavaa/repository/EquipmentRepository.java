@@ -21,4 +21,7 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Integer> {
     List<Equipment> searchEquipments(@Param("tenThietBi") String tenThietBi,
                                      @Param("loaiThietBiId") Integer loaiThietBiId,
                                      @Param("trangThai") String trangThai);
+
+    @Query("SELECT l.tenLoai, COUNT(e) FROM Equipment e JOIN e.loaiThietBi l GROUP BY l.tenLoai")
+    List<Object[]> countEquipmentByType();
 }

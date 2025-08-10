@@ -9,21 +9,48 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
     <script>
-        window.onload = function () {
-            // Authentication sẽ được xử lý bởi Spring Security
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-            if (userName && userRole) {
-                document.getElementById('userNameNav').innerText = userName;
-                document.getElementById('userRoleNav').innerText = userRole;
-            }
-        };
+        function changeTab(event, tabId) {
+            event.preventDefault();
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(function(tabContent) {
+                tabContent.classList.remove('active');
+            });
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'login.html';
+            // Deactivate all tab links
+            document.querySelectorAll('.tab-link').forEach(function(tabLink) {
+                tabLink.classList.remove('border-blue-600', 'text-blue-600');
+                tabLink.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            });
+
+            // Activate the selected tab content
+            document.getElementById(tabId).classList.add('active');
+
+            // Activate the selected tab link
+            event.currentTarget.classList.add('border-blue-600', 'text-blue-600');
+            event.currentTarget.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+        }
+
+        function openConfirmModal(button) {
+            const requestId = button.getAttribute('data-request-id');
+            const loaiThietBi = button.getAttribute('data-loai-thiet-bi');
+            const quantity = button.getAttribute('data-quantity');
+
+            document.getElementById('modalRequestId').value = requestId;
+            document.getElementById('modalLoaiThietBi').innerText = loaiThietBi;
+            document.getElementById('modalQuantity').innerText = quantity;
+
+            // Suggest a name prefix based on equipment type
+            document.getElementById('tenThietBiPrefix').value = loaiThietBi;
+
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
         }
     </script>
 </head>
@@ -39,14 +66,13 @@
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-user-circle text-gray-400 text-lg"></i>
-                    <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+                    <span class="text-sm font-medium text-gray-700" id="userNameNav" th:text="${#authentication.name}"></span>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800" id="userRoleNav">Admin</span>
-                </div>
-                <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -55,7 +81,7 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a th:href="@{/admin/dashboard-admin.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/admin/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
@@ -85,10 +111,22 @@
     <div class="flex-1 p-8">
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Quản lý yêu cầu</h1>
-            <p class="text-gray-600">Quản lý các yêu cầu mượn, trả, bảo trì thiết bị từ người dùng.</p>
+            <p class="text-gray-600">Quản lý các yêu cầu mượn và yêu cầu cấp mới thiết bị.</p>
         </div>
 
-        <!-- Flash message -->
+        <!-- Tab Navigation -->
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <a href="#" onclick="changeTab(event, 'borrow-requests')" class="tab-link border-blue-600 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Yêu cầu mượn thiết bị
+                </a>
+                <a href="#" onclick="changeTab(event, 'new-equipment-requests')" class="tab-link border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Yêu cầu cấp mới thiết bị
+                </a>
+            </nav>
+        </div>
+
+        <!-- Flash messages -->
         <div th:if="${message}" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded relative" role="alert">
             <span class="block sm:inline" th:text="${message}"></span>
         </div>
@@ -96,58 +134,154 @@
             <span class="block sm:inline" th:text="${error}"></span>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Danh sách yêu cầu chờ duyệt</h3>
-                <a href="requests.html?action=add" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <i class="fas fa-plus-circle mr-2"></i>
-                    Tạo yêu cầu mới
-                </a>
+        <!-- Tab Content -->
+        <div id="borrow-requests" class="tab-content active">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Danh sách yêu cầu mượn chờ duyệt</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã yêu cầu</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Người gửi</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thiết bị</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày gửi</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:if="${#lists.isEmpty(borrowRequests)}">
+                            <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Chưa có yêu cầu mượn nào.</td>
+                        </tr>
+                        <tr th:each="request : ${borrowRequests}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="'REQ' + ${request.id}">REQ001</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.nguoiGui.fullName}">Nguyễn Văn A</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.thietBi.tenThietBi}">Máy chiếu Epson EB-X49</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800" th:text="${request.trangThai}">
+                                    Chờ phê duyệt
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.ngayGui != null ? #temporals.format(request.ngayGui, 'dd-MM-yyyy HH:mm') : 'N/A'}">2025-07-10</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <form th:action="@{/admin/requests/approve/{id}(id=${request.id})}" method="post" class="inline">
+                                    <button type="submit" class="text-green-600 hover:text-green-900 mr-4">Duyệt</button>
+                                </form>
+                                <form th:action="@{/admin/requests/reject/{id}(id=${request.id})}" method="post" class="inline">
+                                    <button type="submit" class="text-red-600 hover:text-red-900">Từ chối</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã yêu cầu</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại yêu cầu</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Người gửi</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thiết bị</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày gửi</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                    <tr th:if="${#lists.isEmpty(requests)}">
-                        <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Chưa có yêu cầu nào.</td>
-                    </tr>
-                    <tr th:each="request : ${requests}">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="'REQ' + ${request.id}">REQ001</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Mượn thiết bị</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.nguoiGui.fullName}">Nguyễn Văn A</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.thietBi.tenThietBi}">Máy chiếu Epson EB-X49</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                  th:text="${request.trangThai}"
-                                  th:classappend="${#strings.equals(request.trangThai, 'Chờ xử lý')} ? 'bg-yellow-100 text-yellow-800' : (${#strings.equals(request.trangThai, 'Đang xử lý')} ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800')">
-                                Chờ xử lý
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(request.ngayGui, 'dd-MM-yyyy HH:mm')}">2025-07-10</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <form th:action="@{/admin/requests/approve/{id}(id=${request.id})}" method="post" class="inline">
-                                <button type="submit" class="text-green-600 hover:text-green-900 mr-4">Duyệt</button>
-                            </form>
-                            <form th:action="@{/admin/requests/reject/{id}(id=${request.id})}" method="post" class="inline">
-                                <button type="submit" class="text-red-600 hover:text-red-900">Từ chối</button>
-                            </form>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+        </div>
+
+        <div id="new-equipment-requests" class="tab-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Danh sách yêu cầu cấp mới thiết bị</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã yêu cầu</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Người gửi</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại thiết bị</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày gửi</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:if="${#lists.isEmpty(newEquipmentRequests)}">
+                            <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Chưa có yêu cầu cấp mới nào.</td>
+                        </tr>
+                        <tr th:each="request : ${newEquipmentRequests}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="'NEW' + ${request.id}">NEW001</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.requester.fullName}">Nhân viên A</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.loaiThietBi.tenLoai}">Laptop</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.quantity}">5</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.requestDate != null ? #temporals.format(request.requestDate, 'dd-MM-yyyy HH:mm') : 'N/A'}">2025-07-11</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                      th:text="${request.status}"
+                                      th:classappend="${#strings.equals(request.status, 'Mới')} ? 'bg-blue-100 text-blue-800' : (${#strings.equals(request.status, 'Đã thêm')} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')">
+                                    Mới
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div th:if="${#strings.equals(request.status, 'Đang chờ')}">
+                                    <button th:attr="data-request-id=${request.id}, data-loai-thiet-bi=${request.loaiThietBi.tenLoai}, data-quantity=${request.quantity}"
+                                            onclick="openConfirmModal(this)"
+                                            class="text-green-600 hover:text-green-900 mr-4">Xác nhận</button>
+                                    <form th:action="@{/admin/requests/new/reject/{id}(id=${request.id})}" method="post" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn từ chối yêu cầu này không?');">
+                                        <button type="submit" class="text-red-600 hover:text-red-900">Từ chối</button>
+                                    </form>
+                                </div>
+                                <span th:unless="${#strings.equals(request.status, 'Đang chờ')}" class="text-gray-500">Đã xử lý</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Confirm and Add Equipment Modal -->
+<div id="confirmModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <form th:action="@{/admin/requests/new/confirm}" method="post">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                        Xác nhận và thêm thiết bị mới
+                    </h3>
+                    <div class="mt-4 space-y-4">
+                        <input type="hidden" id="modalRequestId" name="requestId">
+                        <p>Bạn đang thêm <strong id="modalQuantity"></strong> thiết bị loại <strong id="modalLoaiThietBi"></strong>.</p>
+                        <p class="text-sm text-gray-600">Hệ thống sẽ tự động tạo mã thiết bị duy nhất. Vui lòng nhập thông tin chung.</p>
+
+                        <div>
+                            <label for="tenThietBiPrefix" class="block text-sm font-medium text-gray-700">Tên thiết bị (tiền tố)</label>
+                            <input type="text" name="tenThietBiPrefix" id="tenThietBiPrefix" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <p class="text-xs text-gray-500 mt-1">Ví dụ: "Laptop Dell Vostro". Tên cuối cùng sẽ là "Laptop Dell Vostro 1", "Laptop Dell Vostro 2",...</p>
+                        </div>
+                         <div>
+                            <label for="maThietBiPrefix" class="block text-sm font-medium text-gray-700">Mã thiết bị (tiền tố)</label>
+                            <input type="text" name="maThietBiPrefix" id="maThietBiPrefix" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                             <p class="text-xs text-gray-500 mt-1">Ví dụ: "DELL-VOSTRO". Mã sẽ được tạo tự động để đảm bảo tính duy nhất.</p>
+                        </div>
+                        <div>
+                            <label for="viTri" class="block text-sm font-medium text-gray-700">Vị trí</label>
+                            <input type="text" name="viTri" id="viTri" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Ví dụ: Kho A, Tầng 3">
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Xác nhận và Thêm
+                    </button>
+                    <button type="button" onclick="closeConfirmModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Hủy
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

@@ -10,31 +10,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
     </style>
-    <script>
-        window.onload = function () {
-            // Kiểm tra xác thực
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-            
-            // Nếu chưa đăng nhập hoặc không phải admin -> chuyển về trang đăng nhập
-            if (!userName || !userRole || userRole !== 'Admin') {
-                alert('Bạn cần đăng nhập với quyền Admin để truy cập trang này!');
-                window.location.href = '/login.html';
-                return;
-            }
-            
-            // Cập nhật thông tin người dùng
-            document.getElementById('userNameNav').innerText = userName;
-            document.getElementById('userRoleNav').innerText = userRole;
-        };
-
-        function logout() {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                localStorage.clear();
-                window.location.href = '/login.html';
-            }
-        }
-    </script>
 </head>
 <body class="bg-gray-50">
 <nav class="bg-white shadow-sm border-b">
@@ -48,14 +23,16 @@
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-user-circle text-gray-400 text-lg"></i>
-                    <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+                    <span class="text-sm font-medium text-gray-700" th:text="${#authentication.name}"></span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800" id="userRoleNav">Admin</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Admin</span>
                 </div>
-                <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -64,7 +41,7 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a th:href="@{/admin/dashboard-admin.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/admin/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
@@ -141,7 +118,9 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${equipment.viTri}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <a href="#" th:onclick="'showEditModal(' + ${equipment.id} + ')'" class="text-indigo-600 hover:text-indigo-900 mr-4">Sửa</a>
-                            <a href="#" th:onclick="'confirmDelete(' + ${equipment.id} + ')'" class="text-red-600 hover:text-red-900">Xóa</a>
+                            <form th:action="@{'/admin/equipments/delete/' + ${equipment.id}}" method="post" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa thiết bị này?');">
+                                <button type="submit" class="text-red-600 hover:text-red-900">Xóa</button>
+                            </form>
                         </td>
                     </tr>
                     <tr th:if="${equipmentPage.totalElements == 0}">
@@ -161,36 +140,37 @@
                             </p>
                         </div>
                         <div>
-                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                <a th:if="${!equipmentPage.first}" 
-                                   th:href="@{/admin/equipments(page=0, size=${equipmentPage.size})}" 
-                                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <nav class="relative z-0 inline-flex items-center space-x-1" aria-label="Pagination">
+                                <a th:if="${!equipmentPage.first}"
+                                   th:href="@{/admin/equipments(page=0, size=${equipmentPage.size})}"
+                                   class="relative inline-flex items-center px-2 py-2 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <span class="sr-only">Đầu tiên</span>
                                     <i class="fas fa-angle-double-left"></i>
                                 </a>
-                                <a th:if="${!equipmentPage.first}" 
-                                   th:href="@{/admin/equipments(page=${equipmentPage.number-1}, size=${equipmentPage.size})}" 
-                                   class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <a th:if="${!equipmentPage.first}"
+                                   th:href="@{/admin/equipments(page=${equipmentPage.number-1}, size=${equipmentPage.size})}"
+                                   class="relative inline-flex items-center px-2 py-2 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <span class="sr-only">Trước</span>
                                     <i class="fas fa-angle-left"></i>
                                 </a>
-                                
-                                <a th:each="i : ${#numbers.sequence(1, equipmentPage.totalPages)}" 
-                                   th:href="@{/admin/equipments(page=${i-1}, size=${equipmentPage.size})}" 
-                                   th:class="${i-1 == equipmentPage.number ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}" 
-                                   class="relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                    <span th:text="${i}"></span>
-                                </a>
-                                
-                                <a th:if="${!equipmentPage.last}" 
-                                   th:href="@{/admin/equipments(page=${equipmentPage.number+1}, size=${equipmentPage.size})}" 
-                                   class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+
+                                <th:block th:each="i : ${pageNumbers}">
+                                    <a th:href="@{/admin/equipments(page=${i-1}, size=${equipmentPage.size})}"
+                                       th:text="${i}"
+                                       th:class="${i-1 == equipmentPage.number ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}"
+                                       class="relative inline-flex items-center justify-center w-10 h-10 border text-sm font-medium rounded-md">
+                                    </a>
+                                </th:block>
+
+                                <a th:if="${!equipmentPage.last}"
+                                   th:href="@{/admin/equipments(page=${equipmentPage.number+1}, size=${equipmentPage.size})}"
+                                   class="relative inline-flex items-center px-2 py-2 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <span class="sr-only">Tiếp theo</span>
                                     <i class="fas fa-angle-right"></i>
                                 </a>
-                                <a th:if="${!equipmentPage.last}" 
-                                   th:href="@{/admin/equipments(page=${equipmentPage.totalPages-1}, size=${equipmentPage.size})}" 
-                                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <a th:if="${!equipmentPage.last}"
+                                   th:href="@{/admin/equipments(page=${equipmentPage.totalPages-1}, size=${equipmentPage.size})}"
+                                   class="relative inline-flex items-center px-2 py-2 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <span class="sr-only">Cuối cùng</span>
                                     <i class="fas fa-angle-double-right"></i>
                                 </a>
@@ -283,7 +263,7 @@
                             <i class="fas fa-exclamation text-red-600"></i>
                         </div>
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title-delete">
                                 Xác nhận xóa
                             </h3>
                             <div class="mt-2">
@@ -294,9 +274,11 @@
                         </div>
                     </div>
                     <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                        <a id="confirmDeleteBtn" href="#" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Xóa
-                        </a>
+                        <form id="deleteForm" method="post" class="inline">
+                            <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                Xóa
+                            </button>
+                        </form>
                         <button type="button" onclick="closeDeleteModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
                             Hủy
                         </button>
@@ -312,26 +294,40 @@
             document.getElementById('modalTitle').textContent = 'Thêm thiết bị mới';
             document.getElementById('equipmentForm').action = '/admin/equipments/save';
             document.getElementById('equipmentForm').reset();
+            // Clear the ID field specifically for adding new
+            const idField = document.querySelector('#equipmentForm input[name="id"]');
+            if(idField) idField.value = '';
             document.getElementById('equipmentModal').classList.remove('hidden');
         }
         
         // Hiển thị modal chỉnh sửa
-        function showEditModal(id) {
+        async function showEditModal(id) {
             document.getElementById('modalTitle').textContent = 'Chỉnh sửa thiết bị';
             document.getElementById('equipmentForm').action = '/admin/equipments/save';
             
-            // Tải dữ liệu thiết bị và điền vào form
-            fetch('/admin/equipments/edit/' + id)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const form = doc.querySelector('form');
-                    if (form) {
-                        document.getElementById('equipmentForm').innerHTML = form.innerHTML;
-                    }
-                    document.getElementById('equipmentModal').classList.remove('hidden');
-                });
+            try {
+                const response = await fetch('/admin/equipments/api/' + id);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+                const equipment = await response.json();
+                
+                // Điền dữ liệu vào form
+                document.querySelector('#equipmentForm input[name="id"]').value = equipment.id || '';
+                document.querySelector('#equipmentForm input[name="maThietBi"]').value = equipment.maThietBi || '';
+                document.querySelector('#equipmentForm input[name="tenThietBi"]').value = equipment.tenThietBi || '';
+                document.querySelector('#equipmentForm select[name="loaiThietBi"]').value = equipment.loaiThietBi.id || '';
+                document.querySelector('#equipmentForm select[name="trangThai"]').value = equipment.trangThai || 'Sẵn sàng';
+                document.querySelector('#equipmentForm input[name="viTri"]').value = equipment.viTri || '';
+                // Format date correctly for input type="date" which requires yyyy-MM-dd
+                const ngayNhap = equipment.ngayNhap ? new Date(equipment.ngayNhap).toISOString().split('T')[0] : '';
+                document.querySelector('#equipmentForm input[name="ngayNhap"]').value = ngayNhap;
+
+                document.getElementById('equipmentModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Failed to fetch equipment:', error);
+                alert('Không thể tải dữ liệu thiết bị.');
+            }
         }
         
         // Đóng modal
@@ -341,9 +337,8 @@
         
         // Hiển thị modal xác nhận xóa
         function confirmDelete(id) {
-            document.getElementById('confirmDeleteBtn').onclick = function() {
-                window.location.href = '/admin/equipments/delete/' + id;
-            };
+            const form = document.getElementById('deleteForm');
+            form.action = '/admin/equipments/delete/' + id;
             document.getElementById('deleteConfirmModal').classList.remove('hidden');
         }
         

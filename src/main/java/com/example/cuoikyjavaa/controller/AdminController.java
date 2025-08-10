@@ -3,19 +3,24 @@ package com.example.cuoikyjavaa.controller;
 import com.example.cuoikyjavaa.dto.UserDTO;
 import com.example.cuoikyjavaa.model.Equipment;
 import com.example.cuoikyjavaa.model.YeuCauMuon;
+import com.example.cuoikyjavaa.model.YeuCauThietBiMoi;
 import com.example.cuoikyjavaa.repository.EquipmentRepository;
 import com.example.cuoikyjavaa.repository.LoaiThietBiRepository;
 import com.example.cuoikyjavaa.repository.UserRepository;
 import com.example.cuoikyjavaa.repository.YeuCauMuonRepository;
+import com.example.cuoikyjavaa.repository.YeuCauThietBiMoiRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -24,19 +29,44 @@ import java.util.stream.IntStream;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final UserRepository userRepository;
-    private final EquipmentRepository equipmentRepository;
-    private final LoaiThietBiRepository loaiThietBiRepository;
-    private final YeuCauMuonRepository yeuCauMuonRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public AdminController(UserRepository userRepository,
-                          EquipmentRepository equipmentRepository,
-                          LoaiThietBiRepository loaiThietBiRepository,
-                          YeuCauMuonRepository yeuCauMuonRepository) {
-        this.userRepository = userRepository;
-        this.equipmentRepository = equipmentRepository;
-        this.loaiThietBiRepository = loaiThietBiRepository;
-        this.yeuCauMuonRepository = yeuCauMuonRepository;
+    @Autowired
+    private EquipmentRepository equipmentRepository;
+
+    @Autowired
+    private LoaiThietBiRepository loaiThietBiRepository;
+
+    @Autowired
+    private YeuCauMuonRepository yeuCauMuonRepository;
+
+    @Autowired
+    private YeuCauThietBiMoiRepository yeuCauThietBiMoiRepository;
+
+    @GetMapping("/dashboard")
+    public String dashboard(Model model) {
+        long totalUsers = userRepository.count();
+        long totalEquipments = equipmentRepository.count();
+        long pendingRequests = yeuCauMuonRepository.findAllByTrangThai("Chờ phê duyệt").size();
+
+        model.addAttribute("totalUsers", totalUsers);
+        model.addAttribute("totalEquipments", totalEquipments);
+        model.addAttribute("pendingRequests", pendingRequests);
+
+        List<Object[]> equipmentCountByType = equipmentRepository.countEquipmentByType();
+        List<String> labels = equipmentCountByType.stream()
+                .map(result -> (String) result[0])
+                .collect(Collectors.toList());
+        List<Long> data = equipmentCountByType.stream()
+                .map(result -> (Long) result[1])
+                .collect(Collectors.toList());
+
+        model.addAttribute("chartLabels", labels);
+        model.addAttribute("chartData", data);
+
+
+        return "admin/dashboard";
     }
 
     @GetMapping("/users")
@@ -56,36 +86,43 @@ public class AdminController {
         return "admin/users";
     }
 
+    @GetMapping("/equipments/api/{id}")
+    @ResponseBody
+    public Equipment getEquipmentById(@PathVariable("id") Integer id) {
+        return equipmentRepository.findById(id).orElse(null);
+    }
+
     // ========== QUẢN LÝ THIẾT BỊ ==========
     
     @GetMapping("/equipments")
-    public String listEquipments(
-            Model model,
-            @RequestParam(value = "page", required = false) Optional<Integer> page,
-            @RequestParam(value = "size", required = false) Optional<Integer> size) {
-        
-        int currentPage = page.orElse(1);
-        int pageSize = size.orElse(10); // 10 bản ghi mỗi trang
-        
-        Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+    public String equipments(Model model,
+                             @RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<Equipment> equipmentPage = equipmentRepository.findAll(pageable);
-        
-        // Thêm đối tượng equipment mới vào model cho form thêm mới
-        if (!model.containsAttribute("equipment")) {
-            model.addAttribute("equipment", new Equipment());
-        }
-        
         model.addAttribute("equipmentPage", equipmentPage);
         model.addAttribute("loaiThietBiList", loaiThietBiRepository.findAll());
-        
+        model.addAttribute("equipment", new Equipment());
+
         int totalPages = equipmentPage.getTotalPages();
         if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
-                    .boxed()
-                    .collect(Collectors.toList());
-            model.addAttribute("pageNumbers", pageNumbers);
+            int start = Math.max(1, page - 2);
+            int end = Math.min(page + 3, totalPages);
+
+            if (page > 3) {
+                List<Integer> pageNumbers = IntStream.rangeClosed(start, end)
+                        .boxed()
+                        .collect(Collectors.toList());
+                model.addAttribute("pageNumbers", pageNumbers);
+            } else {
+                 List<Integer> pageNumbers = IntStream.rangeClosed(1, Math.min(5, totalPages))
+                        .boxed()
+                        .collect(Collectors.toList());
+                model.addAttribute("pageNumbers", pageNumbers);
+            }
+
         }
-        
+
         return "admin/equipments";
     }
     
@@ -169,8 +206,12 @@ public class AdminController {
 
     @GetMapping("/requests")
     public String requests(Model model) {
-        List<YeuCauMuon> requests = yeuCauMuonRepository.findAllByTrangThai("Chờ phê duyệt");
-        model.addAttribute("requests", requests);
+        List<YeuCauMuon> borrowRequests = yeuCauMuonRepository.findAllByTrangThai("Chờ phê duyệt");
+        model.addAttribute("borrowRequests", borrowRequests);
+
+        List<YeuCauThietBiMoi> newEquipmentRequests = yeuCauThietBiMoiRepository.findAll();
+        model.addAttribute("newEquipmentRequests", newEquipmentRequests);
+
         return "admin/requests";
     }
 
@@ -180,7 +221,7 @@ public class AdminController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request Id:" + id));
         yeuCau.setTrangThai("Đã duyệt");
         yeuCauMuonRepository.save(yeuCau);
-        redirectAttributes.addFlashAttribute("message", "Yêu cầu đã được duyệt thành công!");
+        redirectAttributes.addFlashAttribute("message", "Đã duyệt yêu cầu mượn thành công.");
         return "redirect:/admin/requests";
     }
 
@@ -190,7 +231,57 @@ public class AdminController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request Id:" + id));
         yeuCau.setTrangThai("Đã từ chối");
         yeuCauMuonRepository.save(yeuCau);
-        redirectAttributes.addFlashAttribute("message", "Yêu cầu đã bị từ chối.");
+        redirectAttributes.addFlashAttribute("message", "Đã từ chối yêu cầu mượn.");
+        return "redirect:/admin/requests";
+    }
+
+    // --- New Equipment Request Actions ---
+
+    @PostMapping("/requests/new/reject/{id}")
+    public String rejectNewEquipmentRequest(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        YeuCauThietBiMoi yeuCau = yeuCauThietBiMoiRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid new equipment request Id:" + id));
+        yeuCau.setStatus("Đã từ chối");
+        yeuCauThietBiMoiRepository.save(yeuCau);
+        redirectAttributes.addFlashAttribute("message", "Đã từ chối yêu cầu cấp mới thiết bị.");
+        return "redirect:/admin/requests";
+    }
+
+    @PostMapping("/requests/new/confirm")
+    public String confirmNewEquipmentRequest(@RequestParam("requestId") Integer requestId,
+                                             @RequestParam("tenThietBiPrefix") String tenThietBiPrefix,
+                                             @RequestParam("maThietBiPrefix") String maThietBiPrefix,
+                                             @RequestParam("viTri") String viTri,
+                                             RedirectAttributes redirectAttributes) {
+        YeuCauThietBiMoi yeuCau = yeuCauThietBiMoiRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid new equipment request Id:" + requestId));
+
+        try {
+            for (int i = 1; i <= yeuCau.getQuantity(); i++) {
+                Equipment newEquipment = new Equipment();
+                // Logic to generate unique maThietBi
+                String maThietBi = maThietBiPrefix + "-" + System.currentTimeMillis() + "-" + i;
+                while (equipmentRepository.existsByMaThietBi(maThietBi)) {
+                    maThietBi = maThietBiPrefix + "-" + System.currentTimeMillis() + "-" + (i+1); // Ensure uniqueness
+                }
+
+                newEquipment.setMaThietBi(maThietBi);
+                newEquipment.setTenThietBi(tenThietBiPrefix + " " + i);
+                newEquipment.setLoaiThietBi(yeuCau.getLoaiThietBi());
+                newEquipment.setTrangThai("Sẵn sàng");
+                newEquipment.setViTri(viTri);
+                newEquipment.setNgayNhap(LocalDate.now());
+                equipmentRepository.save(newEquipment);
+            }
+
+            yeuCau.setStatus("Đã thêm");
+            yeuCauThietBiMoiRepository.save(yeuCau);
+            redirectAttributes.addFlashAttribute("message", "Đã thêm " + yeuCau.getQuantity() + " thiết bị mới thành công.");
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Lỗi khi thêm thiết bị mới: " + e.getMessage());
+        }
+
         return "redirect:/admin/requests";
     }
 

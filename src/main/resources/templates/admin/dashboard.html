@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CMC University - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-900">CMC University - Admin Panel</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                 <div class="flex items-center space-x-2">
+                    <i class="fas fa-user-circle text-gray-400 text-lg"></i>
+                    <span class="text-sm font-medium text-gray-700" th:text="${#authentication.name}"></span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Admin</span>
+                </div>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="flex">
+    <div class="w-64 bg-white shadow-sm min-h-screen">
+        <div class="p-4">
+            <nav class="space-y-2">
+                <a th:href="@{/admin/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Tổng quan
+                </a>
+                <a th:href="@{/admin/users}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-users mr-3"></i>
+                    Quản lý người dùng
+                </a>
+                <a th:href="@{/admin/equipments}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-laptop mr-3"></i>
+                    Quản lý thiết bị
+                </a>
+                <a th:href="@{/admin/requests}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    Quản lý yêu cầu
+                </a>
+                <a th:href="@{/admin/reports}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Báo cáo
+                </a>
+                <a th:href="@{/admin/settings}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-cog mr-3"></i>
+                    Cài đặt hệ thống
+                </a>
+            </nav>
+        </div>
+    </div>
+    <div class="flex-1 p-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Quản trị hệ thống</h1>
+            <p class="text-gray-600">Quản lý toàn bộ hệ thống thiết bị CMC University</p>
+        </div>
+
+        <!-- System Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-6 flex items-center">
+                <i class="fas fa-users text-blue-500 text-3xl mr-4"></i>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Tổng người dùng</p>
+                    <p class="text-2xl font-semibold text-gray-900" th:text="${totalUsers}">0</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-6 flex items-center">
+                <i class="fas fa-laptop text-green-500 text-3xl mr-4"></i>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Tổng thiết bị</p>
+                    <p class="text-2xl font-semibold text-gray-900" th:text="${totalEquipments}">0</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-6 flex items-center">
+                <i class="fas fa-clock text-yellow-500 text-3xl mr-4"></i>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Yêu cầu chờ xử lý</p>
+                    <p class="text-2xl font-semibold text-gray-900" th:text="${pendingRequests}">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts and Analytics -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Số lượng thiết bị theo loại</h3>
+            <div class="relative h-96">
+                <canvas id="equipmentByTypeChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('equipmentByTypeChart').getContext('2d');
+        const equipmentData = {
+            labels: /*[[${chartLabels}]]*/ [],
+            datasets: [{
+                label: 'Số lượng',
+                data: /*[[${chartData}]]*/ [],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(153, 102, 255, 0.5)',
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(255, 159, 64, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: equipmentData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html> 
