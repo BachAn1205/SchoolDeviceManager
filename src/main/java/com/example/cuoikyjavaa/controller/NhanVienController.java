@@ -207,4 +207,30 @@ public class NhanVienController {
         redirectAttributes.addFlashAttribute("message", "Cập nhật hồ sơ thành công!");
         return "redirect:/nhanvien/staff_profile";
     }
+
+    @PostMapping("/my_requests/report/cancel/{id}")
+    public String cancelIssueReport(@PathVariable("id") Integer id, @AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
+        if (userDetails == null) {
+            return "redirect:/login.html";
+        }
+        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy người dùng."));
+
+        BaoCaoSuCo issueReport = baoCaoSuCoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy báo cáo sự cố với id: " + id));
+
+        if (!issueReport.getNguoiBaoCao().getUserID().equals(currentUser.getUserID())) {
+            redirectAttributes.addFlashAttribute("error", "Bạn không có quyền hủy báo cáo này.");
+            return "redirect:/nhanvien/my_requests";
+        }
+
+        if (!"Cần xử lý".equals(issueReport.getTrangThai())) {
+            redirectAttributes.addFlashAttribute("error", "Chỉ có thể hủy các báo cáo đang ở trạng thái 'Cần xử lý'.");
+            return "redirect:/nhanvien/my_requests";
+        }
+
+        baoCaoSuCoRepository.delete(issueReport);
+        redirectAttributes.addFlashAttribute("message", "Đã hủy báo cáo sự cố thành công.");
+        return "redirect:/nhanvien/my_requests";
+    }
 }
