@@ -11,4 +11,5 @@ import java.util.List;
 public interface YeuCauMuonRepository extends JpaRepository<YeuCauMuon, Integer> {
     List<YeuCauMuon> findAllByTrangThai(String trangThai);
     List<YeuCauMuon> findByNguoiGui(User user);
+    List<YeuCauMuon> findByNguoiGuiAndTrangThai(User user, String trangThai);
 }

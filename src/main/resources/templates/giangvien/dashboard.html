@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CMC University - Lecturer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-900">CMC University - Lecturer Panel</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-user-circle text-gray-400 text-lg"></i>
+                    <span class="text-sm font-medium text-gray-700" th:text="${user.fullName}"></span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800" th:text="${user.role}"></span>
+                </div>
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="flex">
+    <div class="w-64 bg-white shadow-sm min-h-screen">
+        <div class="p-4">
+            <nav class="space-y-2">
+                <a th:href="@{/giangvien/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Tổng quan
+                </a>
+                <a th:href="@{/giangvien/search_equipment}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-search mr-3"></i>
+                    Tìm thiết bị
+                </a>
+                <a th:href="@{/giangvien/submit_borrow_request}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-plus mr-3"></i>
+                    Gửi yêu cầu mượn thiết bị
+                </a>
+                <a th:href="@{/giangvien/my_requests}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    Yêu cầu của tôi
+                </a>
+                <a th:href="@{/giangvien/borrow_history}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-history mr-3"></i>
+                    Lịch sử
+                </a>
+                <a th:href="@{/giangvien/lecturer_profile}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-user mr-3"></i>
+                    Hồ sơ
+                </a>
+            </nav>
+        </div>
+    </div>
+    <div class="flex-1 p-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Tổng quan</h1>
+            <p class="text-gray-600">Chào mừng trở lại bảng điều khiển Giảng viên, <span th:text="${user.fullName}"></span>!</p>
+            <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Bạn đang đăng nhập với quyền <strong th:text="${user.role}"></strong>.
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="p-4 bg-white rounded-lg shadow-md">
+                <div class="flex items-center">
+                    <div class="p-3 bg-yellow-100 rounded-full">
+                        <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Yêu cầu đang chờ</p>
+                        <p class="text-2xl font-bold text-gray-900" th:text="${pendingRequests}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-white rounded-lg shadow-md">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-100 rounded-full">
+                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Yêu cầu đã duyệt</p>
+                        <p class="text-2xl font-bold text-gray-900" th:text="${approvedRequests}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-white rounded-lg shadow-md">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-full">
+                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M3 10h4v12H3zM10 6h4v16h-4z"></path></svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Thiết bị đang mượn</p>
+                        <p class="text-2xl font-bold text-gray-900" th:text="${borrowedDevices}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Tình trạng yêu cầu của bạn</h3>
+                <div class="relative h-80">
+                    <canvas id="requestsStatusChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Xu hướng mượn thiết bị</h3>
+                <div class="relative h-80">
+                    <canvas id="borrowingTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        // Doughnut Chart for Request Status
+        const requestsStatusCtx = document.getElementById('requestsStatusChart').getContext('2d');
+        new Chart(requestsStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Đang chờ', 'Đã duyệt', 'Đã từ chối'],
+                datasets: [{
+                    label: 'Tình trạng yêu cầu',
+                    data: [
+                        /*[[${pendingRequests}]]*/ 0,
+                        /*[[${approvedRequests}]]*/ 0,
+                        /*[[${rejectedRequests}]]*/ 0
+                    ],
+                    backgroundColor: ['#F59E0B', '#10B981', '#EF4444'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Tình trạng yêu cầu mượn thiết bị'
+                    }
+                }
+            }
+        });
+
+        // Line Chart for Borrowing Trends
+        const borrowingTrendCtx = document.getElementById('borrowingTrendChart').getContext('2d');
+        new Chart(borrowingTrendCtx, {
+            type: 'line',
+            data: {
+                labels: /*[[${trendLabels}]]*/ [],
+                datasets: [{
+                    label: 'Số lượt mượn',
+                    data: /*[[${trendData}]]*/ [],
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Xu hướng mượn thiết bị'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -25,7 +25,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 redirectUrl = "/admin/users"; // Hoặc dashboard của admin
                 break;
             } else if (authorityName.equals("ROLE_GIANGVIEN")) {
-                redirectUrl = "/giangvien/search_equipment";
+                redirectUrl = "/giangvien/dashboard";
                 break;
             } else if (authorityName.equals("ROLE_SINHVIEN")) {
                 redirectUrl = "/sinhvien/find_equipment"; // Hoặc dashboard của sinh viên
