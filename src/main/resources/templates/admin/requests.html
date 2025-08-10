@@ -88,9 +88,17 @@
             <p class="text-gray-600">Quản lý các yêu cầu mượn, trả, bảo trì thiết bị từ người dùng.</p>
         </div>
 
+        <!-- Flash message -->
+        <div th:if="${message}" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded relative" role="alert">
+            <span class="block sm:inline" th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded relative" role="alert">
+            <span class="block sm:inline" th:text="${error}"></span>
+        </div>
+
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Danh sách yêu cầu</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Danh sách yêu cầu chờ duyệt</h3>
                 <a href="requests.html?action=add" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     <i class="fas fa-plus-circle mr-2"></i>
                     Tạo yêu cầu mới
@@ -110,32 +118,29 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">REQ001</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Mượn thiết bị</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Nguyễn Văn A</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Máy chiếu Epson EB-X49</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Chờ xử lý</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-10</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-green-600 hover:text-green-900 mr-4">Duyệt</a>
-                            <a href="#" class="text-red-600 hover:text-red-900">Từ chối</a>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(requests)}">
+                        <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Chưa có yêu cầu nào.</td>
                     </tr>
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">REQ002</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Báo hỏng</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Trần Thị B</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Laptop Dell Latitude 7420</td>
+                    <tr th:each="request : ${requests}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="'REQ' + ${request.id}">REQ001</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Mượn thiết bị</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.nguoiGui.fullName}">Nguyễn Văn A</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.thietBi.tenThietBi}">Máy chiếu Epson EB-X49</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Đang xử lý</span>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                  th:text="${request.trangThai}"
+                                  th:classappend="${#strings.equals(request.trangThai, 'Chờ xử lý')} ? 'bg-yellow-100 text-yellow-800' : (${#strings.equals(request.trangThai, 'Đang xử lý')} ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800')">
+                                Chờ xử lý
+                            </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-08</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(request.ngayGui, 'dd-MM-yyyy HH:mm')}">2025-07-10</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-green-600 hover:text-green-900 mr-4">Hoàn thành</a>
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Xem chi tiết</a>
+                            <form th:action="@{/admin/requests/approve/{id}(id=${request.id})}" method="post" class="inline">
+                                <button type="submit" class="text-green-600 hover:text-green-900 mr-4">Duyệt</button>
+                            </form>
+                            <form th:action="@{/admin/requests/reject/{id}(id=${request.id})}" method="post" class="inline">
+                                <button type="submit" class="text-red-600 hover:text-red-900">Từ chối</button>
+                            </form>
                         </td>
                     </tr>
                     </tbody>

@@ -1,11 +1,12 @@
-package com.example.devicemanager.controller;
+package com.example.cuoikyjavaa.controller;
 
 import com.example.cuoikyjavaa.dto.UserDTO;
 import com.example.cuoikyjavaa.model.Equipment;
-import com.example.cuoikyjavaa.model.LoaiThietBi;
+import com.example.cuoikyjavaa.model.YeuCauMuon;
 import com.example.cuoikyjavaa.repository.EquipmentRepository;
 import com.example.cuoikyjavaa.repository.LoaiThietBiRepository;
 import com.example.cuoikyjavaa.repository.UserRepository;
+import com.example.cuoikyjavaa.repository.YeuCauMuonRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,13 +27,16 @@ public class AdminController {
     private final UserRepository userRepository;
     private final EquipmentRepository equipmentRepository;
     private final LoaiThietBiRepository loaiThietBiRepository;
+    private final YeuCauMuonRepository yeuCauMuonRepository;
 
-    public AdminController(UserRepository userRepository, 
+    public AdminController(UserRepository userRepository,
                           EquipmentRepository equipmentRepository,
-                          LoaiThietBiRepository loaiThietBiRepository) {
+                          LoaiThietBiRepository loaiThietBiRepository,
+                          YeuCauMuonRepository yeuCauMuonRepository) {
         this.userRepository = userRepository;
         this.equipmentRepository = equipmentRepository;
         this.loaiThietBiRepository = loaiThietBiRepository;
+        this.yeuCauMuonRepository = yeuCauMuonRepository;
     }
 
     @GetMapping("/users")
@@ -165,7 +169,29 @@ public class AdminController {
 
     @GetMapping("/requests")
     public String requests(Model model) {
+        List<YeuCauMuon> requests = yeuCauMuonRepository.findAllByTrangThai("Chờ phê duyệt");
+        model.addAttribute("requests", requests);
         return "admin/requests";
+    }
+
+    @PostMapping("/requests/approve/{id}")
+    public String approveRequest(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        YeuCauMuon yeuCau = yeuCauMuonRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid request Id:" + id));
+        yeuCau.setTrangThai("Đã duyệt");
+        yeuCauMuonRepository.save(yeuCau);
+        redirectAttributes.addFlashAttribute("message", "Yêu cầu đã được duyệt thành công!");
+        return "redirect:/admin/requests";
+    }
+
+    @PostMapping("/requests/reject/{id}")
+    public String rejectRequest(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        YeuCauMuon yeuCau = yeuCauMuonRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid request Id:" + id));
+        yeuCau.setTrangThai("Đã từ chối");
+        yeuCauMuonRepository.save(yeuCau);
+        redirectAttributes.addFlashAttribute("message", "Yêu cầu đã bị từ chối.");
+        return "redirect:/admin/requests";
     }
 
     @GetMapping("/reports")

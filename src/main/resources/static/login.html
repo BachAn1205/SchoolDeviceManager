@@ -63,7 +63,7 @@
 
 <div class="container">
     <h1 class="login-title">Đăng nhập hệ thống quản lý thiết bị</h1>
-    <form onsubmit="login(event)">
+    <form action="/login" method="post">
         <div class="form-row">
             <div style="flex:1;">
                 <label for="username">Tên đăng nhập:</label>
@@ -88,77 +88,6 @@
         </ul>
     </div>
 </footer>
-
-<script>
-    async function login(event) {
-        event.preventDefault(); // Ngăn submit mặc định
-
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value.trim();
-
-        if (!username || !password) {
-            alert('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!');
-            return;
-        }
-
-        try {
-            const response = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ username, password })
-            });
-
-            if (!response.ok) {
-                const errText = await response.text();
-                alert("Đăng nhập thất bại: " + errText);
-                return;
-            }
-
-            const data = await response.json();
-
-            // ✅ Log toàn bộ dữ liệu người dùng ra console
-            console.log("Dữ liệu trả về từ backend:", data);
-            console.log("ID:", data.user.id);
-            console.log("Tên:", data.user.fullName || data.user.username);
-            console.log("Email:", data.user.email);
-            console.log("Vai trò:", data.user.role);
-            alert(data.message || "Đăng nhập thành công!");
-
-            // ✅ Lưu vào localStorage để dùng sau
-            localStorage.setItem("userRole", data.user.role);
-            localStorage.setItem("userName", data.user.fullName || data.user.username);
-
-            // ✅ Điều hướng theo vai trò
-            switch (data.user.role) {
-                case "Admin":
-                    window.location.href = "admin/dashboard-admin.html";
-                    break;
-                case "Nhân viên thiết bị":
-                    window.location.href = "nhanvien/dashboard-nhanvien.html";
-                    break;
-                case "Kỹ thuật viên":
-                    window.location.href = "kythuatvien/dashboard-kythuatvien.html";
-                    break;
-                case "Giảng viên":
-                    window.location.href = "giangvien/dashboard-giangvien.html";
-                    break;
-                case "Sinh viên":
-                    window.location.href = "sinhvien/dashboard-sinhvien.html";
-                    break;
-                default:
-                    alert("Vai trò không xác định: " + data.user.role);
-            }
-
-
-        } catch (error) {
-            console.error("Lỗi trong quá trình đăng nhập:", error);
-            alert("Đã xảy ra lỗi kết nối hoặc xử lý dữ liệu. Vui lòng thử lại.");
-        }
-    }
-</script>
-
 
 </body>
 </html>

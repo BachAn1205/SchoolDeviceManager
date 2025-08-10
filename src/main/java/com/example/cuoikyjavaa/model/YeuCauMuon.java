@@ -21,7 +21,13 @@ public class YeuCauMuon {
     @Column(name = "so_luong", nullable = false)
     private Integer soLuong;
 
-    @Column(name = "ngay_gui", nullable = false)
+    @Column(name = "ngay_muon")
+    private LocalDateTime ngayMuon;
+
+    @Column(name = "ngay_tra_du_kien")
+    private LocalDateTime ngayTraDuKien;
+
+    @Column(name = "ngay_gui", nullable = true)
     private LocalDateTime ngayGui;
 
     @Column(name = "trang_thai")
@@ -38,6 +44,12 @@ public class YeuCauMuon {
 
     public Integer getSoLuong() { return soLuong; }
     public void setSoLuong(Integer soLuong) { this.soLuong = soLuong; }
+
+    public LocalDateTime getNgayMuon() { return ngayMuon; }
+    public void setNgayMuon(LocalDateTime ngayMuon) { this.ngayMuon = ngayMuon; }
+
+    public LocalDateTime getNgayTraDuKien() { return ngayTraDuKien; }
+    public void setNgayTraDuKien(LocalDateTime ngayTraDuKien) { this.ngayTraDuKien = ngayTraDuKien; }
 
     public LocalDateTime getNgayGui() { return ngayGui; }
     public void setNgayGui(LocalDateTime ngayGui) { this.ngayGui = ngayGui; }

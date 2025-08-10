@@ -8,6 +8,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+    public SecurityConfig(CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) {
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -23,20 +29,26 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/api/auth/register",
                                 "/api/auth/login",
-                                "/favicon.ico",
-                                "/admin/**",
-                                "/giangvien/**",
-                                "/nhanvien/**",
-                                "/sinhvien/**",
-                                "/kythuatvien/**"
+                                "/favicon.ico"
                         ).permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/giangvien/**").hasRole("GIANGVIEN")
+                        .requestMatchers("/sinhvien/**").hasRole("SINHVIEN")
+                        .requestMatchers("/nhanvien/**").hasRole("NHANVIEN")
+                        .requestMatchers("/kythuatvien/**").hasRole("KYTHUATVIEN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login.html")
+                        .loginProcessingUrl("/login") // URL xử lý đăng nhập
+                        .successHandler(customAuthenticationSuccessHandler)
+                        .failureUrl("/login.html?error=true")
                         .permitAll()
                 )
-                .logout(logout -> logout.permitAll());
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login.html?logout=true")
+                        .permitAll());
 
         return http.build();
     }
