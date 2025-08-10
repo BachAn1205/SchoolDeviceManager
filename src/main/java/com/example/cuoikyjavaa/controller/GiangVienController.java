@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,44 +62,25 @@ public class GiangVienController {
         return "giangvien/search_equipment";
     }
 
-    @PostMapping("/create_borrow_request")
-    public String createBorrowRequest(@RequestParam("thietBiId") Integer thietBiId,
-                                      @AuthenticationPrincipal UserDetails userDetails,
-                                      RedirectAttributes redirectAttributes) {
-
-        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
-        if (user == null) {
-            redirectAttributes.addFlashAttribute("error", "Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.");
-            return "redirect:/giangvien/search_equipment";
-        }
-
-        Equipment equipment = equipmentRepository.findById(thietBiId).orElse(null);
-        if (equipment == null) {
-            redirectAttributes.addFlashAttribute("error", "Thiết bị không tồn tại.");
-            return "redirect:/giangvien/search_equipment";
-        }
-
+    @GetMapping("/submit_borrow_request")
+    public String showBorrowRequestForm(Model model, @RequestParam(value = "thietBiId", required = false) Integer thietBiId) {
         YeuCauMuon yeuCauMuon = new YeuCauMuon();
-        yeuCauMuon.setNguoiGui(user);
-        yeuCauMuon.setThietBi(equipment);
-        yeuCauMuon.setSoLuong(1); // Mặc định số lượng là 1
-        yeuCauMuon.setNgayGui(LocalDateTime.now());
-        yeuCauMuon.setTrangThai("Chờ phê duyệt");
-
-        yeuCauMuonRepository.save(yeuCauMuon);
-
-        redirectAttributes.addFlashAttribute("message", "Gửi yêu cầu mượn cho thiết bị '" + equipment.getTenThietBi() + "' thành công!");
-        return "redirect:/giangvien/search_equipment";
+        if (thietBiId != null) {
+            equipmentRepository.findById(thietBiId).ifPresent(yeuCauMuon::setThietBi);
+        }
+        model.addAttribute("yeuCauMuon", yeuCauMuon);
+        model.addAttribute("equipments", equipmentRepository.findAll());
+        return "giangvien/submit_borrow_request";
     }
 
-    @PostMapping("/my_requests/add")
-    public String addBorrowRequest(@ModelAttribute("newYeuCauMuon") YeuCauMuon yeuCauMuon,
-                                   @AuthenticationPrincipal UserDetails userDetails,
-                                   RedirectAttributes redirectAttributes) {
+    @PostMapping("/submit_borrow_request")
+    public String submitBorrowRequest(@ModelAttribute("yeuCauMuon") YeuCauMuon yeuCauMuon,
+                                      @AuthenticationPrincipal UserDetails userDetails,
+                                      RedirectAttributes redirectAttributes) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
         if (user == null) {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy thông tin người dùng.");
-            return "redirect:/giangvien/my_requests";
+            return "redirect:/giangvien/submit_borrow_request";
         }
 
         yeuCauMuon.setNguoiGui(user);
@@ -106,7 +88,38 @@ public class GiangVienController {
         yeuCauMuon.setTrangThai("Chờ phê duyệt");
         yeuCauMuonRepository.save(yeuCauMuon);
 
-        redirectAttributes.addFlashAttribute("message", "Tạo yêu cầu mượn thành công!");
+        redirectAttributes.addFlashAttribute("message", "Gửi yêu cầu mượn thành công!");
+        return "redirect:/giangvien/my_requests";
+    }
+
+    @PostMapping("/my_requests/cancel/{id}")
+    public String cancelRequest(@PathVariable("id") Integer id,
+                                @AuthenticationPrincipal UserDetails userDetails,
+                                RedirectAttributes redirectAttributes) {
+        if (userDetails == null) {
+            return "redirect:/login.html";
+        }
+
+        User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+        YeuCauMuon yeuCau = yeuCauMuonRepository.findById(id).orElse(null);
+
+        if (yeuCau == null) {
+            redirectAttributes.addFlashAttribute("error", "Không tìm thấy yêu cầu.");
+            return "redirect:/giangvien/my_requests";
+        }
+
+        if (currentUser == null || !yeuCau.getNguoiGui().getUserID().equals(currentUser.getUserID())) {
+            redirectAttributes.addFlashAttribute("error", "Bạn không có quyền hủy yêu cầu này.");
+            return "redirect:/giangvien/my_requests";
+        }
+
+        if (!"Chờ phê duyệt".equals(yeuCau.getTrangThai())) {
+            redirectAttributes.addFlashAttribute("error", "Chỉ có thể hủy các yêu cầu đang chờ phê duyệt.");
+            return "redirect:/giangvien/my_requests";
+        }
+
+        yeuCauMuonRepository.delete(yeuCau);
+        redirectAttributes.addFlashAttribute("message", "Đã hủy yêu cầu thành công.");
         return "redirect:/giangvien/my_requests";
     }
 

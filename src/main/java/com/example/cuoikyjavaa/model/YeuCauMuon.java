@@ -21,6 +21,9 @@ public class YeuCauMuon {
     @Column(name = "so_luong", nullable = false)
     private Integer soLuong;
 
+    @Column(name = "muc_dich_su_dung")
+    private String mucDichSuDung;
+
     @Column(name = "ngay_muon")
     private LocalDateTime ngayMuon;
 
@@ -44,6 +47,9 @@ public class YeuCauMuon {
 
     public Integer getSoLuong() { return soLuong; }
     public void setSoLuong(Integer soLuong) { this.soLuong = soLuong; }
+
+    public String getMucDichSuDung() { return mucDichSuDung; }
+    public void setMucDichSuDung(String mucDichSuDung) { this.mucDichSuDung = mucDichSuDung; }
 
     public LocalDateTime getNgayMuon() { return ngayMuon; }
     public void setNgayMuon(LocalDateTime ngayMuon) { this.ngayMuon = ngayMuon; }

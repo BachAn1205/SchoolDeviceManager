@@ -149,11 +149,9 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${equipment.viTri}"></td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <form th:if="${#strings.equals(equipment.trangThai, 'Sẵn sàng')}"
-                      th:action="@{/giangvien/create_borrow_request}" method="post" class="inline">
-                  <input type="hidden" name="thietBiId" th:value="${equipment.id}" />
-                  <button type="submit" class="text-blue-600 hover:text-blue-900">Yêu cầu mượn</button>
-                </form>
+                <a th:if="${#strings.equals(equipment.trangThai, 'Sẵn sàng')}"
+                   th:href="@{/giangvien/submit_borrow_request(thietBiId=${equipment.id})}"
+                   class="text-blue-600 hover:text-blue-900">Yêu cầu mượn</a>
                 <span th:unless="${#strings.equals(equipment.trangThai, 'Sẵn sàng')}"
                       class="text-gray-400">Không khả dụng</span>
               </td>
