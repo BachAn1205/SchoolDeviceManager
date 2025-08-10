@@ -11,65 +11,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
     </style>
-    <script>
-        window.onload = function () {
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-
-            if (userName && userRole) {
-                document.getElementById('userNameNav').innerText = userName;
-                document.getElementById('userRoleNav').innerText = userRole;
-            }
-
-            // Sample Chart for Reports Page (can be expanded)
-            const reportCtx = document.getElementById('reportChart').getContext('2d');
-            new Chart(reportCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
-                    datasets: [{
-                        label: 'Số lượng yêu cầu',
-                        data: [12, 19, 3, 5, 2, 3],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
-            });
-        };
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    </script>
 </head>
 <body class="bg-gray-50">
 <nav class="bg-white shadow-sm border-b">
@@ -83,14 +24,16 @@
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-user-circle text-gray-400 text-lg"></i>
-                    <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+                    <span class="text-sm font-medium text-gray-700" th:text="${#authentication.name}"></span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800" id="userRoleNav">Admin</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Admin</span>
                 </div>
-                <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>

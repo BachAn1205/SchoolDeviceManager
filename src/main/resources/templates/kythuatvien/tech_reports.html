@@ -11,88 +11,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
     </style>
-    <script>
-        window.onload = function() {
-            // Auth xử lý phía server; chỉ gán UI nếu có dữ liệu local
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-            if (userName && userRole) {
-                document.getElementById('userNameNav').innerText = userName;
-                document.getElementById('userRoleNav').innerText = userRole;
-            }
-
-            // Sample Chart for Maintenance Completion Rate
-            const maintenanceCompletionCtx = document.getElementById('maintenanceCompletionChart').getContext('2d');
-            new Chart(maintenanceCompletionCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
-                    datasets: [{
-                        label: 'Số nhiệm vụ hoàn thành',
-                        data: [10, 12, 15, 13, 16, 18],
-                        backgroundColor: '#10B981',
-                        borderColor: '#059669',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: 'Tỷ lệ hoàn thành bảo trì'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Sample Chart for Repair Time
-            const repairTimeCtx = document.getElementById('repairTimeChart').getContext('2d');
-            new Chart(repairTimeCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Thiết bị A', 'Thiết bị B', 'Thiết bị C', 'Thiết bị D', 'Thiết bị E'],
-                    datasets: [{
-                        label: 'Thời gian sửa chữa trung bình (giờ)',
-                        data: [5, 3, 8, 4, 6],
-                        borderColor: '#EF4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: 'Thời gian sửa chữa trung bình của thiết bị'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        };
-        function logout() {
-            localStorage.clear();
-            window.location.href = '/login.html';
-        }
-    </script>
 </head>
 <body class="bg-gray-50">
 <nav class="bg-white shadow-sm border-b">
@@ -106,14 +24,16 @@
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-user-circle text-gray-400 text-lg"></i>
-                    <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+                    <span class="text-sm font-medium text-gray-700" th:text="${#authentication.name}"></span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800" id="userRoleNav">Kỹ thuật viên</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Kỹ thuật viên</span>
                 </div>
-                <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -122,7 +42,7 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a th:href="@{/kythuatvien/dashboard-kythuatvien.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>

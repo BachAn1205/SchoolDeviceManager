@@ -10,21 +10,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
     </style>
-    <script>
-        window.onload = function() {
-            // Auth được xử lý phía server; chỉ cập nhật UI nếu có dữ liệu
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-            if (userName && userRole) {
-                document.getElementById('userNameNav').innerText = userName;
-                document.getElementById('userRoleNav').innerText = userRole;
-            }
-        };
-        function logout() {
-            localStorage.clear();
-            window.location.href = '/login.html';
-        }
-    </script>
 </head>
 <body class="bg-gray-50">
 <nav class="bg-white shadow-sm border-b">
@@ -38,14 +23,16 @@
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-user-circle text-gray-400 text-lg"></i>
-                    <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+                    <span class="text-sm font-medium text-gray-700" th:text="${#authentication.name}"></span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800" id="userRoleNav">Kỹ thuật viên</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Kỹ thuật viên</span>
                 </div>
-                <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -54,7 +41,7 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a th:href="@{/kythuatvien/dashboard-kythuatvien.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>

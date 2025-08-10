@@ -1,4 +1,4 @@
-package com.example.cuoikyjavaa.controller;
+  package com.example.cuoikyjavaa.controller;
 
 import com.example.cuoikyjavaa.dto.UserDTO;
 import com.example.cuoikyjavaa.model.Equipment;
@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import com.example.cuoikyjavaa.model.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Controller
 @RequestMapping("/admin")
@@ -43,6 +45,9 @@ public class AdminController {
 
     @Autowired
     private YeuCauThietBiMoiRepository yeuCauThietBiMoiRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -78,7 +83,7 @@ public class AdminController {
                         u.getUsername(),
                         u.getFullName(),
                         u.getEmail(),
-                        u.getPhone(),
+                        u.getPhoneNumber(),
                         u.getRole()
                 ))
                 .collect(Collectors.toList());
@@ -173,30 +178,28 @@ public class AdminController {
                 user.getUsername(),
                 user.getFullName(),
                 user.getEmail(),
-                user.getPhone(),
+                user.getPhoneNumber(),
                 user.getRole()
         );
         model.addAttribute("user", dto);
         return "admin/user_edit";
     }
 
-    @org.springframework.web.bind.annotation.PostMapping("/users/edit")
-    public String updateUser(@org.springframework.web.bind.annotation.ModelAttribute("user") UserDTO dto) {
-        if (dto.getUserID() == null) return "redirect:/admin/users";
-        var userOpt = userRepository.findById(dto.getUserID());
-        if (userOpt.isEmpty()) return "redirect:/admin/users";
-        var user = userOpt.get();
-        // Không cho sửa username và password tại đây
-        user.setFullName(dto.getFullName());
-        user.setEmail(dto.getEmail());
-        user.setPhone(dto.getPhone());
-        user.setRole(dto.getRole());
+    @PostMapping("/users/update/{id}")
+    public String updateUser(@PathVariable("id") Integer id, @ModelAttribute("user") User userDetails) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        user.setUsername(userDetails.getUsername());
+        user.setFullName(userDetails.getFullName());
+        user.setEmail(userDetails.getEmail());
+        user.setPhoneNumber(userDetails.getPhoneNumber());
+        user.setRole(userDetails.getRole());
         userRepository.save(user);
         return "redirect:/admin/users";
     }
 
-    @org.springframework.web.bind.annotation.PostMapping("/users/delete/{id}")
-    public String deleteUser(@org.springframework.web.bind.annotation.PathVariable("id") Integer id) {
+    @PostMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable("id") Integer id) {
         if (id != null && userRepository.existsById(id)) {
             userRepository.deleteById(id);
         }
@@ -219,9 +222,22 @@ public class AdminController {
     public String approveRequest(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
         YeuCauMuon yeuCau = yeuCauMuonRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request Id:" + id));
-        yeuCau.setTrangThai("Đã duyệt");
-        yeuCauMuonRepository.save(yeuCau);
-        redirectAttributes.addFlashAttribute("message", "Đã duyệt yêu cầu mượn thành công.");
+
+        Equipment equipment = yeuCau.getThietBi();
+        if (equipment != null) {
+            if ("Sẵn sàng".equals(equipment.getTrangThai())) {
+                equipment.setTrangThai("Đang sử dụng");
+                equipmentRepository.save(equipment);
+
+                yeuCau.setTrangThai("Đã duyệt");
+                yeuCauMuonRepository.save(yeuCau);
+                redirectAttributes.addFlashAttribute("message", "Đã duyệt yêu cầu mượn. Trạng thái thiết bị đã được cập nhật thành 'Đang sử dụng'.");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Không thể duyệt yêu cầu. Thiết bị '" + equipment.getTenThietBi() + "' hiện không có sẵn.");
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Yêu cầu không hợp lệ do không liên kết với thiết bị nào.");
+        }
         return "redirect:/admin/requests";
     }
 
@@ -300,3 +316,5 @@ public class AdminController {
         return "admin/admin_profile";
     }
 }
+
+

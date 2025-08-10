@@ -5,35 +5,63 @@ public class UserDTO {
     private String username;
     private String fullName;
     private String email;
-    private String phone;
+    private String phoneNumber;
     private String role;
 
+    // Constructor mặc định (cần thiết cho các framework như Spring)
     public UserDTO() {}
 
-    public UserDTO(Integer userID, String username, String fullName, String email, String phone, String role) {
+    // Constructor đầy đủ tham số
+    public UserDTO(Integer userID, String username, String fullName, String email, String phoneNumber, String role) {
         this.userID = userID;
         this.username = username;
         this.fullName = fullName;
         this.email = email;
-        this.phone = phone;
+        this.phoneNumber = phoneNumber;
         this.role = role;
     }
 
-    public Integer getUserID() { return userID; }
-    public void setUserID(Integer userID) { this.userID = userID; }
+    // --- Getters và Setters cho tất cả các thuộc tính ---
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public Integer getUserID() {
+        return userID;
+    }
+    public void setUserID(Integer userID) {
+        this.userID = userID;
+    }
 
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getFullName() {
+        return fullName;
+    }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
-} 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getRole() {
+        return role;
+    }
+    public void setRole(String role) {
+        this.role = role;
+    }
+}

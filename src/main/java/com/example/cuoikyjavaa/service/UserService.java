@@ -66,7 +66,7 @@ public class UserService implements UserDetailsService {
         List<String> errors = new ArrayList<>();
         if (repo.existsByUsername(user.getUsername())) errors.add("Tên người dùng đã tồn tại");
         if (repo.existsByEmail(user.getEmail())) errors.add("Email đã được sử dụng");
-        if (repo.existsByPhone(user.getPhone())) errors.add("Số điện thoại đã được sử dụng");
+        if (repo.existsByPhoneNumber(user.getPhoneNumber())) errors.add("Số điện thoại đã được sử dụng");
         if (!errors.isEmpty()) return errors;
         user.setPassword(encoder.encode(user.getPassword()));
         repo.save(user);

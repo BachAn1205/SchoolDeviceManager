@@ -45,6 +45,10 @@
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
+                <a th:href="@{/nhanvien/equipments}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-desktop mr-3"></i>
+                    Quản lý thiết bị
+                </a>
                 <a th:href="@{/nhanvien/request_equipment}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-laptop mr-3"></i>
                     Yêu cầu thiết bị
@@ -57,10 +61,7 @@
                     <i class="fas fa-list-alt mr-3"></i>
                     Yêu cầu của tôi
                 </a>
-                <a th:href="@{/nhanvien/staff_profile}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
-                    <i class="fas fa-user mr-3"></i>
-                    Hồ sơ
-                </a>
+                
             </nav>
         </div>
     </div>
@@ -70,34 +71,58 @@
             <p class="text-gray-600">Mô tả sự cố bạn đang gặp phải để chúng tôi có thể hỗ trợ.</p>
         </div>
 
+        <!-- Flash messages -->
+        <div th:if="${message}" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded relative" role="alert">
+            <span class="block sm:inline" th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded relative" role="alert">
+            <span class="block sm:inline" th:text="${error}"></span>
+        </div>
+
+        <!-- Search Form -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Tìm kiếm thiết bị</h3>
+            <form th:action="@{/nhanvien/report_issue}" method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                    <label for="loaiThietBiId" class="block text-sm font-medium text-gray-700">Loại thiết bị</label>
+                    <select id="loaiThietBiId" name="loaiThietBiId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <option value="">Tất cả các loại</option>
+                        <option th:each="loai : ${loaiThietBiList}"
+                                th:value="${loai.id}"
+                                th:text="${loai.tenLoai}"
+                                th:selected="${selectedLoaiId != null && selectedLoaiId == loai.id}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="keyword" class="block text-sm font-medium text-gray-700">Tên thiết bị (từ khóa)</label>
+                    <input type="text" id="keyword" name="keyword" th:value="${keyword}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Nhập tên thiết bị...">
+                </div>
+                <div class="md:col-span-1">
+                     <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-search mr-2"></i>
+                        Tìm kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+
+
         <div class="bg-white rounded-lg shadow-sm p-6">
-            <form>
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Điền thông tin báo cáo</h3>
+            <form th:action="@{/nhanvien/report_issue}" th:object="${newBaoCao}" method="post">
+                <div class="grid grid-cols-1 gap-6">
                     <div>
-                        <label for="deviceLocation" class="block text-sm font-medium text-gray-700">Vị trí thiết bị</label>
-                        <input type="text" id="deviceLocation" name="deviceLocation" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ví dụ: Phòng B203, Tầng 3">
-                    </div>
-                    <div>
-                        <label for="issueType" class="block text-sm font-medium text-gray-700">Loại sự cố</label>
-                        <select id="issueType" name="issueType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                            <option>Chọn loại sự cố</option>
-                            <option>Lỗi phần cứng</option>
-                            <option>Lỗi phần mềm</option>
-                            <option>Lỗi mạng/kết nối</option>
-                            <option>Không hoạt động</option>
-                            <option>Khác</option>
+                        <label for="thietBi" class="block text-sm font-medium text-gray-700">Thiết bị gặp sự cố</label>
+                        <select id="thietBi" th:field="*{thietBi}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" required>
+                            <option value="">-- Chọn thiết bị --</option>
+                            <option th:each="equipment : ${equipments}"
+                                    th:value="${equipment.id}"
+                                    th:text="${equipment.tenThietBi} + ' (' + ${equipment.maThietBi} + ')'"></option>
                         </select>
                     </div>
-                    <div class="sm:col-span-2">
-                        <label for="issueDescription" class="block text-sm font-medium text-gray-700">Mô tả chi tiết sự cố</label>
-                        <textarea id="issueDescription" name="issueDescription" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Mô tả chi tiết vấn đề bạn đang gặp phải, các bước để tái hiện lỗi (nếu có)..."></textarea>
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label for="contactMethod" class="block text-sm font-medium text-gray-700">Phương thức liên hệ ưa thích</label>
-                        <select id="contactMethod" name="contactMethod" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                            <option>Email</option>
-                            <option>Điện thoại</option>
-                        </select>
+                    <div>
+                        <label for="moTaSuCo" class="block text-sm font-medium text-gray-700">Mô tả chi tiết sự cố</label>
+                        <textarea id="moTaSuCo" th:field="*{moTaSuCo}" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Mô tả chi tiết vấn đề bạn đang gặp phải..." required></textarea>
                     </div>
                 </div>
                 <div class="mt-6 flex justify-end">

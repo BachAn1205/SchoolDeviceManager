@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -13,87 +13,6 @@
         .card-hover { transition: all 0.3s ease; }
         .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
     </style>
-    <script>
-        window.onload = function() {
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-            if (!userName || !userRole) {
-                window.location.href = 'login.html';
-                return;
-            }
-            if (userRole !== 'Kỹ thuật viên') {
-                window.location.href = '/login.html';
-                return;
-            }
-            document.getElementById('userNameNav').innerText = userName;
-            document.getElementById('userRoleNav').innerText = userRole;
-            document.getElementById('userRoleAccess').innerText = userRole;
-
-            // Sample Chart for Maintenance Status
-            const maintenanceStatusCtx = document.getElementById('maintenanceStatusChart').getContext('2d');
-            new Chart(maintenanceStatusCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Đang chờ', 'Đang thực hiện', 'Hoàn thành'],
-                    datasets: [{
-                        data: [7, 3, 15],
-                        backgroundColor: ['#F59E0B', '#3B82F6', '#10B981'],
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Tình trạng nhiệm vụ bảo trì'
-                        }
-                    }
-                }
-            });
-
-            // Sample Chart for Repair Trends
-            const repairTrendCtx = document.getElementById('repairTrendChart').getContext('2d');
-            new Chart(repairTrendCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
-                    datasets: [{
-                        label: 'Số lượng sửa chữa',
-                        data: [10, 8, 12, 15, 11, 14],
-                        backgroundColor: '#EF4444',
-                        borderColor: '#DC2626',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: 'Xu hướng sửa chữa thiết bị'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        };
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = '/login.html';
-        }
-    </script>
 </head>
 <body class="bg-gray-50">
 <nav class="bg-white shadow-sm border-b">
@@ -107,14 +26,16 @@
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-user-circle text-gray-400 text-lg"></i>
-                    <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+                    <span class="text-sm font-medium text-gray-700" th:text="${#authentication.name}"></span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800" id="userRoleNav">Kỹ thuật viên</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Kỹ thuật viên</span>
                 </div>
-                <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -123,23 +44,23 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a href="dashboard-kythuatvien.html" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                <a th:href="@{/kythuatvien/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
-                <a href="/kythuatvien/maintenance_schedule" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/maintenance_schedule}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-calendar-alt mr-3"></i>
                     Lịch bảo trì
                 </a>
-                <a href="/kythuatvien/repair_requests" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/repair_requests}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-wrench mr-3"></i>
                     Sửa chữa
                 </a>
-                <a href="/kythuatvien/equipment_management" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/equipment_management}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-laptop mr-3"></i>
                     Thiết bị
                 </a>
-                <a href="/kythuatvien/tech_reports" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/tech_reports}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-chart-bar mr-3"></i>
                     Báo cáo
                 </a>
@@ -149,11 +70,11 @@
     <div class="flex-1 p-8">
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Tổng quan kỹ thuật viên</h1>
-            <p class="text-gray-600">Chào mừng trở lại bảng điều khiển Kỹ thuật viên, <span id="userNameNav"></span>!</p>
+            <p class="text-gray-600">Chào mừng trở lại bảng điều khiển Kỹ thuật viên, <span th:text="${#authentication.name}"></span>!</p>
             <div class="mt-2 p-3 bg-orange-50 border border-orange-200 rounded-md">
                 <p class="text-sm text-orange-800">
                     <i class="fas fa-tools mr-2"></i>
-                    Bạn đang đăng nhập với quyền <strong id="userRoleAccess">Kỹ thuật viên</strong>.
+                    Bạn đang đăng nhập với quyền <strong>Kỹ thuật viên</strong>.
                 </p>
             </div>
         </div>
@@ -206,5 +127,65 @@
         </div>
     </div>
 </div>
+<script>
+    // Sample Chart for Maintenance Status
+    const maintenanceStatusCtx = document.getElementById('maintenanceStatusChart').getContext('2d');
+    new Chart(maintenanceStatusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Đang chờ', 'Đang thực hiện', 'Hoàn thành'],
+            datasets: [{
+                data: [7, 3, 15],
+                backgroundColor: ['#F59E0B', '#3B82F6', '#10B981'],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Tình trạng nhiệm vụ bảo trì'
+                }
+            }
+        }
+    });
+
+    // Sample Chart for Repair Trends
+    const repairTrendCtx = document.getElementById('repairTrendChart').getContext('2d');
+    new Chart(repairTrendCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
+            datasets: [{
+                label: 'Số lượng sửa chữa',
+                data: [10, 8, 12, 15, 11, 14],
+                backgroundColor: '#EF4444',
+                borderColor: '#DC2626',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Xu hướng sửa chữa thiết bị'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 </body>
 </html>

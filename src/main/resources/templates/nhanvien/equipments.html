@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CMC University - Quản lý thiết bị</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-900">CMC University - Employee Panel</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-user-circle text-gray-400 text-lg"></i>
+                    <span class="text-sm font-medium text-gray-700" th:text="${#authentication.name}"></span>
+                </div>
+                 <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Nhân viên</span>
+                </div>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="flex">
+    <div class="w-64 bg-white shadow-sm min-h-screen">
+        <div class="p-4">
+            <nav class="space-y-2" id="main-nav">
+                 <a th:href="@{/nhanvien/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Tổng quan
+                </a>
+                <a th:href="@{/nhanvien/equipments}" class="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                    <i class="fas fa-desktop mr-3"></i>
+                    Quản lý thiết bị
+                </a>
+                <a th:href="@{/nhanvien/request_equipment}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-laptop mr-3"></i>
+                    Yêu cầu thiết bị
+                </a>
+                <a th:href="@{/nhanvien/report_issue}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    Báo cáo sự cố
+                </a>
+                <a th:href="@{/nhanvien/my_requests}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-list-alt mr-3"></i>
+                    Yêu cầu của tôi
+                </a>
+                
+            </nav>
+        </div>
+    </div>
+    <div class="flex-1 p-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Quản lý thiết bị</h1>
+            <p class="text-gray-600">Xem, tìm kiếm và quản lý các thiết bị trong hệ thống.</p>
+        </div>
+
+        <div th:if="${message}" class="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã thiết bị</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên thiết bị</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vị trí</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:if="${equipmentPage.empty}">
+                        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Không tìm thấy thiết bị nào.</td>
+                    </tr>
+                    <tr th:each="equipment : ${equipmentPage.content}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${equipment.maThietBi}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${equipment.tenThietBi}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${equipment.loaiThietBi.tenLoai}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                   th:text="${equipment.trangThai}"
+                                   th:classappend="${#strings.equals(equipment.trangThai, 'Sẵn sàng')} ? 'bg-green-100 text-green-800' :
+                                                  (${#strings.equals(equipment.trangThai, 'Đang sử dụng')} ? 'bg-blue-100 text-blue-800' :
+                                                  (${#strings.equals(equipment.trangThai, 'Đang bảo trì')} ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'))">
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${equipment.viTri}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div th:if="${equipmentPage.totalPages > 1}" class="mt-6 flex items-center justify-between">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <a th:href="@{/nhanvien/equipments(page=${equipmentPage.number - 1}, size=${equipmentPage.size})}" th:if="${equipmentPage.hasPrevious()}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Previous
+                    </a>
+                    <a th:href="@{/nhanvien/equipments(page=${equipmentPage.number + 1}, size=${equipmentPage.size})}" th:if="${equipmentPage.hasNext()}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Next
+                    </a>
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Hiển thị
+                            <span class="font-medium" th:text="${equipmentPage.number * equipmentPage.size + 1}"></span>
+                            đến
+                            <span class="font-medium" th:text="${equipmentPage.number * equipmentPage.size + equipmentPage.numberOfElements}"></span>
+                            của
+                            <span class="font-medium" th:text="${equipmentPage.totalElements}"></span>
+                            kết quả
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <a th:href="@{/nhanvien/equipments(page=${equipmentPage.number - 1}, size=${equipmentPage.size})}" th:if="${equipmentPage.hasPrevious()}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Previous</span>
+                                <i class="fas fa-chevron-left h-5 w-5"></i>
+                            </a>
+                            <a th:each="i : ${pageNumbers}" th:href="@{/nhanvien/equipments(page=${i-1}, size=${equipmentPage.size})}"
+                               th:text="${i}"
+                               th:classappend="${i-1 == equipmentPage.number} ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'"
+                               class="relative inline-flex items-center justify-center w-10 h-10 border text-sm font-medium">
+                            </a>
+                            <a th:href="@{/nhanvien/equipments(page=${equipmentPage.number + 1}, size=${equipmentPage.size})}" th:if="${equipmentPage.hasNext()}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Next</span>
+                                <i class="fas fa-chevron-right h-5 w-5"></i>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

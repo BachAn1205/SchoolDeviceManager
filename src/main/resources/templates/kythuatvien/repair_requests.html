@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-Ż" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CMC University - Yêu cầu sửa chữa</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -10,21 +10,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
     </style>
-    <script>
-        window.onload = function() {
-            // Xác thực xử lý phía server; chỉ hiển thị nếu có dữ liệu
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-            if (userName && userRole) {
-                document.getElementById('userNameNav').innerText = userName;
-                document.getElementById('userRoleNav').innerText = userRole;
-            }
-        };
-        function logout() {
-            localStorage.clear();
-            window.location.href = '/login.html';
-        }
-    </script>
 </head>
 <body class="bg-gray-50">
 <nav class="bg-white shadow-sm border-b">
@@ -38,14 +23,16 @@
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-user-circle text-gray-400 text-lg"></i>
-                    <span class="text-sm font-medium text-gray-700" id="userNameNav"></span>
+                    <span class="text-sm font-medium text-gray-700" th:text="${#authentication.name}"></span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800" id="userRoleNav">Kỹ thuật viên</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Kỹ thuật viên</span>
                 </div>
-                <a href="#" onclick="logout()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -54,7 +41,7 @@
     <div class="w-64 bg-white shadow-sm min-h-screen">
         <div class="p-4">
             <nav class="space-y-2">
-                <a th:href="@{/kythuatvien/dashboard-kythuatvien.html}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                <a th:href="@{/kythuatvien/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
@@ -83,6 +70,14 @@
             <p class="text-gray-600">Quản lý và xử lý các yêu cầu sửa chữa thiết bị từ người dùng.</p>
         </div>
 
+        <!-- Flash messages -->
+        <div th:if="${message}" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded relative" role="alert">
+            <span class="block sm:inline" th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded relative" role="alert">
+            <span class="block sm:inline" th:text="${error}"></span>
+        </div>
+
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -98,32 +93,41 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">RQF001</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Máy in Canon G3010</td>
-                        <td class="px-6 py-4 text-sm text-gray-500">Kẹt giấy liên tục</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Giảng viên B</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-12</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Cần xử lý</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-blue-600 hover:text-blue-900 mr-4">Tiếp nhận</a>
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Xem chi tiết</a>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(repairRequests)}">
+                        <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Không có yêu cầu sửa chữa nào.</td>
                     </tr>
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">RQF002</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Laptop sinh viên</td>
-                        <td class="px-6 py-4 text-sm text-gray-500">Không lên nguồn</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Sinh viên C</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-10</td>
+                    <tr th:each="request : ${repairRequests}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="'RQF' + ${request.id}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.thietBi.tenThietBi}"></td>
+                        <td class="px-6 py-4 text-sm text-gray-500" th:text="${request.moTaSuCo}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.nguoiBaoCao.fullName}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(request.ngayBaoCao, 'dd-MM-yyyy HH:mm')}"></td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Đang tiến hành</span>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                  th:text="${request.trangThai}"
+                                  th:classappend="${#strings.equals(request.trangThai, 'Cần xử lý')} ? 'bg-red-100 text-red-800' :
+                                                 (${#strings.equals(request.trangThai, 'Đang xử lý')} ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800')">
+                            </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-green-600 hover:text-green-900 mr-4">Hoàn thành</a>
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Xem chi tiết</a>
+                            <!-- Conditional buttons -->
+                            <form th:if="${#strings.equals(request.trangThai, 'Cần xử lý')}"
+                                  th:action="@{/kythuatvien/repair_requests/acknowledge/{id}(id=${request.id})}"
+                                  method="post" class="inline"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn tiếp nhận yêu cầu này?');">
+                                <button type="submit" class="text-blue-600 hover:text-blue-900 mr-4">Tiếp nhận</button>
+                            </form>
+
+                            <form th:if="${#strings.equals(request.trangThai, 'Đang xử lý')}"
+                                  th:action="@{/kythuatvien/repair_requests/complete/{id}(id=${request.id})}"
+                                  method="post" class="inline"
+                                  onsubmit="return confirm('Xác nhận đã hoàn thành sửa chữa cho yêu cầu này?');">
+                                <button type="submit" class="text-green-600 hover:text-green-900 mr-4">Hoàn thành</button>
+                            </form>
+                            
+                            <button th:attr="data-request=${objectMapper.writeValueAsString(request)}"
+                                    onclick="openDetailsModal(this.getAttribute('data-request'))"
+                                    class="text-indigo-600 hover:text-indigo-900">Xem chi tiết</button>
                         </td>
                     </tr>
                     </tbody>
@@ -132,5 +136,58 @@
         </div>
     </div>
 </div>
+
+<!-- Details Modal -->
+<div id="detailsModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i class="fas fa-info-circle text-blue-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Chi tiết yêu cầu sửa chữa</h3>
+                        <div class="mt-4 space-y-2 text-sm text-gray-600">
+                           <p><strong>Mã yêu cầu:</strong> <span id="modalRequestId"></span></p>
+                           <p><strong>Thiết bị:</strong> <span id="modalEquipmentName"></span> (<span id="modalEquipmentCode"></span>)</p>
+                           <p><strong>Người báo cáo:</strong> <span id="modalReporterName"></span></p>
+                           <p><strong>Ngày báo cáo:</strong> <span id="modalReportDate"></span></p>
+                           <p><strong>Trạng thái:</strong> <span id="modalStatus"></span></p>
+                           <p><strong>Mô tả sự cố:</strong></p>
+                           <div id="modalDescription" class="mt-1 p-2 border rounded-md bg-gray-50 max-h-40 overflow-y-auto"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="closeDetailsModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openDetailsModal(requestJson) {
+        const request = JSON.parse(requestJson);
+        document.getElementById('modalRequestId').textContent = 'RQF' + request.id;
+        document.getElementById('modalEquipmentName').textContent = request.thietBi.tenThietBi;
+        document.getElementById('modalEquipmentCode').textContent = request.thietBi.maThietBi;
+        document.getElementById('modalReporterName').textContent = request.nguoiBaoCao.fullName;
+        document.getElementById('modalReportDate').textContent = new Date(request.ngayBaoCao).toLocaleString('vi-VN');
+        document.getElementById('modalStatus').textContent = request.trangThai;
+        document.getElementById('modalDescription').textContent = request.moTaSuCo;
+        document.getElementById('detailsModal').classList.remove('hidden');
+    }
+
+    function closeDetailsModal() {
+        document.getElementById('detailsModal').classList.add('hidden');
+    }
+</script>
+
 </body>
 </html>

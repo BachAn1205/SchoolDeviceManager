@@ -9,7 +9,22 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
+    <script>
+        function changeTab(event, tabId) {
+            event.preventDefault();
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.querySelectorAll('.tab-link').forEach(tl => {
+                tl.classList.remove('border-blue-600', 'text-blue-600');
+                tl.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            });
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('border-blue-600', 'text-blue-600');
+            event.currentTarget.classList.remove('border-transparent', 'text-gray-500');
+        }
+    </script>
 </head>
 <body class="bg-gray-50">
 <nav class="bg-white shadow-sm border-b">
@@ -45,6 +60,10 @@
                     <i class="fas fa-tachometer-alt mr-3"></i>
                     Tổng quan
                 </a>
+                <a th:href="@{/nhanvien/equipments}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
+                    <i class="fas fa-desktop mr-3"></i>
+                    Quản lý thiết bị
+                </a>
                 <a th:href="@{/nhanvien/request_equipment}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
                     <i class="fas fa-laptop mr-3"></i>
                     Yêu cầu thiết bị
@@ -57,10 +76,7 @@
                     <i class="fas fa-list-alt mr-3"></i>
                     Yêu cầu của tôi
                 </a>
-                <a th:href="@{/nhanvien/staff_profile}" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">
-                    <i class="fas fa-user mr-3"></i>
-                    Hồ sơ
-                </a>
+                
             </nav>
         </div>
     </div>
@@ -68,6 +84,18 @@
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Yêu cầu của tôi</h1>
             <p class="text-gray-600">Theo dõi trạng thái các yêu cầu bạn đã gửi.</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <a href="#" onclick="changeTab(event, 'new-equipment')" class="tab-link border-blue-600 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Yêu cầu thêm thiết bị
+                </a>
+                <a href="#" onclick="changeTab(event, 'report-issue')" class="tab-link border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Báo cáo sự cố
+                </a>
+            </nav>
         </div>
 
         <!-- Flash messages -->
@@ -78,48 +106,90 @@
             <span class="block sm:inline" th:text="${error}"></span>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã yêu cầu</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại thiết bị</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày gửi</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                    <tr th:if="${#lists.isEmpty(requests)}">
-                        <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Bạn chưa có yêu cầu nào.</td>
-                    </tr>
-                    <tr th:each="request : ${requests}">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="'NEW' + ${request.id}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.loaiThietBi.tenLoai}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.quantity}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(request.requestDate, 'dd-MM-yyyy HH:mm')}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                  th:text="${request.status}"
-                                  th:classappend="${#strings.equals(request.status, 'Đang chờ')} ? 'bg-yellow-100 text-yellow-800' :
-                                                 (${#strings.equals(request.status, 'Đã thêm')} ? 'bg-green-100 text-green-800' :
-                                                 'bg-red-100 text-red-800')">
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                           <form th:if="${#strings.equals(request.status, 'Đang chờ')}"
-                                  th:action="@{/nhanvien/my_requests/cancel/{id}(id=${request.id})}"
-                                  method="post"
-                                  onsubmit="return confirm('Bạn có chắc chắn muốn hủy yêu cầu này không?');">
-                               <button type="submit" class="text-red-600 hover:text-red-900">Hủy</button>
-                           </form>
-                            <span th:unless="${#strings.equals(request.status, 'Đang chờ')}" class="text-gray-400">Không có hành động</span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+        <!-- Tab Content -->
+        <div id="new-equipment" class="tab-content active">
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Danh sách yêu cầu thêm thiết bị</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã yêu cầu</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại thiết bị</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày gửi</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:if="${#lists.isEmpty(newEquipmentRequests)}">
+                            <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Bạn chưa có yêu cầu thêm thiết bị nào.</td>
+                        </tr>
+                        <tr th:each="request : ${newEquipmentRequests}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="'NEW' + ${request.id}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.loaiThietBi.tenLoai}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${request.quantity}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(request.requestDate, 'dd-MM-yyyy HH:mm')}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                      th:text="${request.status}"
+                                      th:classappend="${#strings.equals(request.status, 'Đang chờ')} ? 'bg-yellow-100 text-yellow-800' :
+                                                     (${#strings.equals(request.status, 'Đã thêm')} ? 'bg-green-100 text-green-800' :
+                                                     'bg-red-100 text-red-800')">
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                               <form th:if="${#strings.equals(request.status, 'Đang chờ')}"
+                                      th:action="@{/nhanvien/my_requests/cancel/{id}(id=${request.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('Bạn có chắc chắn muốn hủy yêu cầu này không?');">
+                                   <button type="submit" class="text-red-600 hover:text-red-900">Hủy</button>
+                               </form>
+                                <span th:unless="${#strings.equals(request.status, 'Đang chờ')}" class="text-gray-400">Không có hành động</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="report-issue" class="tab-content">
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Danh sách báo cáo sự cố</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã báo cáo</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thiết bị</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mô tả</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày báo cáo</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:if="${#lists.isEmpty(issueReports)}">
+                            <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Bạn chưa có báo cáo sự cố nào.</td>
+                        </tr>
+                        <tr th:each="report : ${issueReports}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="'RP' + ${report.id}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${report.thietBi.tenThietBi}"></td>
+                            <td class="px-6 py-4 text-sm text-gray-500" th:text="${report.moTaSuCo}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(report.ngayBaoCao, 'dd-MM-yyyy HH:mm')}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                      th:text="${report.trangThai}"
+                                      th:classappend="${#strings.equals(report.trangThai, 'Cần xử lý')} ? 'bg-red-100 text-red-800' :
+                                                     (${#strings.equals(report.trangThai, 'Đang xử lý')} ? 'bg-yellow-100 text-yellow-800' :
+                                                     'bg-green-100 text-green-800')">
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

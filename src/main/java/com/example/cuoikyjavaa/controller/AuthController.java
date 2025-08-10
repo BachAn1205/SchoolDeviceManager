@@ -55,7 +55,7 @@ public class AuthController {
                     foundUser.getUsername(),
                     foundUser.getFullName(),
                     foundUser.getEmail(),
-                    foundUser.getPhone(),
+                    foundUser.getPhoneNumber(),
                     foundUser.getRole()
             );
 

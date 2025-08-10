@@ -225,9 +225,15 @@ public class GiangVienController {
             return "redirect:/giangvien/borrow_history";
         }
 
+        Equipment equipment = yeuCau.getThietBi();
+        if (equipment != null) {
+            equipment.setTrangThai("Sẵn sàng");
+            equipmentRepository.save(equipment);
+        }
+
         yeuCau.setTrangThai("Đã trả");
         yeuCauMuonRepository.save(yeuCau);
-        redirectAttributes.addFlashAttribute("message", "Đã cập nhật trạng thái trả thiết bị thành công.");
+        redirectAttributes.addFlashAttribute("message", "Đã cập nhật trạng thái trả thiết bị thành công. Thiết bị hiện đã 'Sẵn sàng'.");
         return "redirect:/giangvien/borrow_history";
     }
 
@@ -272,25 +278,16 @@ public class GiangVienController {
     }
 
     @PostMapping("/lecturer_profile/update")
-    public String updateLecturerProfile(@ModelAttribute("user") User userForm,
-                                        @AuthenticationPrincipal UserDetails userDetails,
-                                        RedirectAttributes redirectAttributes) {
-        if (userDetails == null) {
-            return "redirect:/login.html";
-        }
+    public String updateLecturerProfile(@ModelAttribute("user") User updatedUser, @AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
+        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy người dùng."));
 
-        User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
-        if (currentUser == null) {
-            redirectAttributes.addFlashAttribute("error", "Không tìm thấy người dùng để cập nhật.");
-            return "redirect:/giangvien/lecturer_profile";
-        }
-
-        // Cập nhật các trường được phép thay đổi
-        currentUser.setFullName(userForm.getFullName());
-        currentUser.setEmail(userForm.getEmail());
-        currentUser.setPhone(userForm.getPhone());
+        currentUser.setFullName(updatedUser.getFullName());
+        currentUser.setEmail(updatedUser.getEmail());
+        currentUser.setPhoneNumber(updatedUser.getPhoneNumber());
 
         userRepository.save(currentUser);
+
         redirectAttributes.addFlashAttribute("message", "Cập nhật hồ sơ thành công!");
         return "redirect:/giangvien/lecturer_profile";
     }
