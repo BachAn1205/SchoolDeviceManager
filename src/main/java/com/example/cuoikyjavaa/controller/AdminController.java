@@ -155,7 +155,7 @@ public class AdminController {
         return "admin/equipments :: equipmentForm";
     }
     
-    @GetMapping("/equipments/delete/{id}")
+    @PostMapping("/equipments/delete/{id}")
     public String deleteEquipment(@PathVariable("id") Integer id, 
                                 RedirectAttributes redirectAttributes) {
         try {
@@ -186,15 +186,16 @@ public class AdminController {
     }
 
     @PostMapping("/users/update/{id}")
-    public String updateUser(@PathVariable("id") Integer id, @ModelAttribute("user") User userDetails) {
+    public String updateUser(@PathVariable("id") Integer id, @ModelAttribute("user") UserDTO userDetails, RedirectAttributes redirectAttributes) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-        user.setUsername(userDetails.getUsername());
+
         user.setFullName(userDetails.getFullName());
         user.setEmail(userDetails.getEmail());
         user.setPhoneNumber(userDetails.getPhoneNumber());
-        user.setRole(userDetails.getRole());
+
         userRepository.save(user);
+        redirectAttributes.addFlashAttribute("message", "Cập nhật người dùng thành công!");
         return "redirect:/admin/users";
     }
 
