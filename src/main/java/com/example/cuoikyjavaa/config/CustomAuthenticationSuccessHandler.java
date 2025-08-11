@@ -24,17 +24,14 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             if (authorityName.equals("ROLE_ADMIN")) {
                 redirectUrl = "/admin/dashboard";
                 break;
-            } else if (authorityName.equals("ROLE_GIANGVIEN")) {
+            } else if (authorityName.equals("ROLE_GIANGVIEN") || authorityName.equals("ROLE_SINHVIEN")) {
                 redirectUrl = "/giangvien/dashboard";
-                break;
-            } else if (authorityName.equals("ROLE_SINHVIEN")) {
-                redirectUrl = "/sinhvien/find_equipment"; // Hoặc dashboard của sinh viên
                 break;
             } else if (authorityName.equals("ROLE_NHANVIEN")) {
                 redirectUrl = "/nhanvien/dashboard"; // Hoặc dashboard của nhân viên
                 break;
             } else if (authorityName.equals("ROLE_KYTHUATVIEN")) {
-                redirectUrl = "/kythuatvien/equipment_management"; // Hoặc dashboard của kỹ thuật viên
+                redirectUrl = "/kythuatvien/dashboard"; // Hoặc dashboard của kỹ thuật viên
                 break;
             }
         }
